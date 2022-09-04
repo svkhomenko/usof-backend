@@ -1,7 +1,7 @@
 {
     "host": "localhost",
     "user": "root",
-    "password": "Eesomkina1967",
+    "password": "",
     "database": "usof",
     "dialect": "mysql"
 }
