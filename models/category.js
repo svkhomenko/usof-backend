@@ -7,6 +7,10 @@ module.exports = function initCategory (sequelize) {
             primaryKey: true,
             autoIncrement: true
         },
+        title: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         description: { 
             type: DataTypes.TEXT,
             allowNull: false,
