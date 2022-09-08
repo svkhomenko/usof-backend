@@ -4,10 +4,10 @@ const AdminJSSequelize = require('@adminjs/sequelize');
 const express = require("express");
 const app = express();
 
-// app.use('/static', express.static('public'));
+app.use(express.static('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 const db = require("./models/init.js");
-// console.log(db.sequelize.models);
 const adminJsResources = require("./models/resources");
 
 AdminJS.registerAdapter(AdminJSSequelize);

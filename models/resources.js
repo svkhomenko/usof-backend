@@ -1,24 +1,81 @@
-const bcrypt  = require("bcrypt");
+const AdminJS = require('adminjs');
+const uploadFeature = require('@adminjs/upload');
+const { BaseProvider } = require('@adminjs/upload');
+const fs = require("fs");
+const { move } = require("fs-extra");
+const path = require("path");
 const db = require("./init.js");
 
 const User = db.sequelize.models.user; 
 const CategoryPost = db.sequelize.models.CategoryPost; 
 const LikeForComment = db.sequelize.models.likeForComment; 
 
+class UploadProvider extends BaseProvider {
+    constructor() {
+        super('uploads');
+    }
+
+    async upload(file, key) {
+        // console.log('upload', file, key);
+        const filePath = process.platform === "win32" ? this.path(key) : this.path(key).slice(1); 
+        await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+        await move(file.path, filePath, { overwrite: true });
+    }
+
+    async delete(key, bucket) {
+        // console.log('delete', key, bucket);
+    }
+
+    path(key, bucket) {
+        // console.log('path', key, bucket);
+        return process.platform === "win32"
+        ? `${path.join(bucket || this.bucket, key)}`
+        : `/${path.join(bucket || this.bucket, key)}`;
+    }
+}
+
 module.exports = [
     {
         resource: User,
         options: {
-            listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role'],
-            actions: {
-                new: {
-                    before: hashPassword
+            listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role'],
+            // actions: {
+            //     new: {
+            //         before: hashPassword
+            //     },
+            //     edit: {
+            //         before: hashPassword
+            //     }
+            // },
+            properties: {
+                picturePath: {
+                    isVisible: { list: false, filter: false, show: false, edit: false }
                 },
-                edit: {
-                    before: hashPassword
+                rating: {
+                    isVisible: { list: true, filter: true, show: true, edit: false }
+                },
+                profilePicture: {
+                    isVisible: { list: true, filter: false, show: true, edit: true },
+                    components: {
+                        show: AdminJS.bundle('../components/avatar_show.js'),
+                        list: AdminJS.bundle('../components/avatar_list.js')
+                    }
                 }
             }
-        }
+        },
+        features: [
+            uploadFeature({
+                provider: new UploadProvider(),
+                properties: {
+                    file: 'profilePicture',
+                    key: 'picturePath', 
+                    mimeType: 'mimeType' 
+                },
+                validation: {
+                    mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
+                }
+            })
+        ]
     },
     {
         resource: CategoryPost,
@@ -102,12 +159,13 @@ module.exports = [
 ];
 
 async function hashPassword(request) {
-    if (request.payload.password) {
-        let salt = bcrypt.genSaltSync(10);
-        request.payload = {
-            ...request.payload,
-            password: await bcrypt.hash(request.payload.password, salt)
-        }
-    }
+    console.log("request", request.payload);
+    // if (request.payload.password) {
+    //     let salt = bcrypt.genSaltSync(10);
+    //     request.payload = {
+    //         ...request.payload,
+    //         password: await bcrypt.hash(request.payload.password, salt)
+    //     }
+    // }
     return request;
 }

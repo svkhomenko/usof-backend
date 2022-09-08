@@ -104,7 +104,17 @@ User.belongsToMany(Comment, {
 });
 Comment.belongsToMany(User, { through: LikeForComment});
 
+// sequelize.sync({ force: true });
 sequelize.sync({ alter: true });
+// sequelize.sync();
+
+// User.create({
+//     login: 'aasa',
+//     password: 'dfsdg',
+//     fullName: 'sfdsgtg',
+//     email: 'difgssdio@gmail.com',
+//     profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
+// });
 
 const db = {
     sequelize: sequelize,
