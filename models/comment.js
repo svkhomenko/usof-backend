@@ -20,6 +20,12 @@ module.exports = function initComment (sequelize) {
         content: { 
             type: DataTypes.TEXT,
             allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         }
+    },
+    { 
+        timestamps: false
     });
 }

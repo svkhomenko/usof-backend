@@ -4,8 +4,10 @@ const Avatar = (props) => {
     console.log("props", props);
     let src = "/avatar.png";
     if (props.record.params.profilePicture) {
-        // src = 'data:image/png;base64,' + Buffer.from(props.record.params.profilePicture, "binary").toString("base64");
         src = 'data:image/png;base64,' + props.record.params.profilePicture;
+    }
+    else if (props.record.params.image) {
+        src = 'data:image/png;base64,' + props.record.params.image;
     }
 
     return (

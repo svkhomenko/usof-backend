@@ -10,10 +10,19 @@ module.exports = function initCategory (sequelize) {
         title: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         },
         description: { 
             type: DataTypes.TEXT,
             allowNull: false,
+            validate: {
+                notEmpty: true
+            }
         } 
+    },
+    { 
+        timestamps: false
     });
 }

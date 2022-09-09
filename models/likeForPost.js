@@ -30,5 +30,8 @@ module.exports = function initLikeForPost (sequelize) {
             allowNull: false,
             defaultValue: "like"
         }
+    },
+    { 
+        timestamps: false
     });
 }

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const bcrypt  = require("bcrypt");
-const path = require("path");
-const fs = require("fs");
+
+const setPicturePath = require("./setPicturePath");
 
 module.exports = function initUser (sequelize) {
     const User = sequelize.define("user", {
@@ -55,11 +55,13 @@ module.exports = function initUser (sequelize) {
         },
         picturePath: {
             type: DataTypes.VIRTUAL,
-            set: setPicturePath
+            set(value) {
+                setPicturePath(this, value, "profilePicture")
+            }
         },
         rating: {
             type: DataTypes.VIRTUAL,
-            get: getRating
+            // get: getRating
         },
         role: {
             type: DataTypes.ENUM('admin', 'user'),
@@ -68,6 +70,7 @@ module.exports = function initUser (sequelize) {
         }
     },
     {
+        timestamps: false,
         hooks: {
             beforeUpdate: (instance) => {
                 if (instance.dataValues.password !== instance._previousDataValues.password) {
@@ -82,20 +85,34 @@ module.exports = function initUser (sequelize) {
         }
     });
 
-    async function getRating() {
-        // const User = sequelize.models.user; 
-        const id = this.getDataValue("id");
-        const user = await User.findOne({
-            where: {
-              id: id
-            },
-            include: sequelize.models.post
-        });
-        // const posts = await user.getPosts();
-        // console.log(posts);
-        console.log(user);
-        return id;
-    }
+    // User.prototype.getRating = function() {
+    //     // let bio = this.getDataValue('bio');
+    //     // if (bio) {
+    //     //     let bestFriend = await db.models.User.findById(this.getDataValue('BestFriendId'))
+    //     //     if(bestFriend){
+    //     //         bio += ` Best friend: ${bestFriend.name}.`;
+    //     //     }
+    //     //     return bio;
+    //     // } else {
+    //     //     return '';
+    //     // }
+    //     return 5;
+    // }
+
+    // async function getRating() {
+    //     // const User = sequelize.models.user; 
+    //     const id = this.getDataValue("id");
+    //     // const user = await User.findOne({
+    //     //     where: {
+    //     //       id: id
+    //     //     },
+    //     //     include: sequelize.models.post
+    //     // });
+    //     // // const posts = await user.getPosts();
+    //     // // console.log(posts);
+    //     // console.log(user);
+    //     return id;
+    // }
 }
 
 function validatePassword(password) {
@@ -110,30 +127,5 @@ function validatePassword(password) {
     }
     if (!/(?=.*[A-Z])/.test(password)) {
         throw new Error("Password must containt at least one uppercase letter");
-    }
-}
-
-function setPicturePath(value) {
-    this.setDataValue("picturePath", value);
-
-    if (value) {
-        const filePath = path.resolve("uploads", value);
-        let file;
-        try {
-            file = fs.readFileSync(filePath);
-        }
-        catch(error) {
-            console.log('setter picturePath', error);
-        }
-
-        if (file) {
-            this.setDataValue("profilePicture", file);
-            fs.rmSync(filePath);
-
-            const dirPath = path.resolve("uploads", path.dirname(value));
-            if (fs.existsSync(dirPath) && fs.readdirSync(dirPath).length === 0) {
-                fs.rmdirSync(dirPath);
-            }
-        }
     }
 }

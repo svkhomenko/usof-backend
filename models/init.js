@@ -7,6 +7,7 @@ const initUser = require("./user");
 const initPost = require("./post");
 const initImageFromPost = require("./imageFromPost");
 const initCategory = require("./category");
+const initCategoryPost = require("./categoryPost");
 const initComment = require("./comment");
 const initLikeForPost = require("./likeForPost");
 const initLikeForComment = require("./likeForComment");
@@ -35,6 +36,7 @@ initUser(sequelize);
 initPost(sequelize);
 initImageFromPost(sequelize);
 initCategory(sequelize);
+initCategoryPost(sequelize);
 initComment(sequelize);
 initLikeForPost(sequelize);
 initLikeForComment(sequelize);
@@ -43,6 +45,7 @@ const User = sequelize.models.user;
 const Post = sequelize.models.post;
 const ImageFromPost = sequelize.models.imageFromPost;
 const Category = sequelize.models.category;
+const CategoryPost = sequelize.models.categoryPost;
 const Comment = sequelize.models.comment;
 const LikeForPost = sequelize.models.likeForPost;
 const LikeForComment = sequelize.models.likeForComment;
@@ -55,8 +58,8 @@ const UserPostSettings = {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 };
-User.hasMany(Post, UserPostSettings);
-Post.belongsTo(User, UserPostSettings);
+User.hasMany(Post, { as: 'ownPosts', ...UserPostSettings});
+Post.belongsTo(User, {  as: 'postAuthor', ...UserPostSettings});
 
 const PostImageSettings = {
     foreignKey: {
@@ -68,8 +71,8 @@ const PostImageSettings = {
 Post.hasMany(ImageFromPost, PostImageSettings);
 ImageFromPost.belongsTo(Post, PostImageSettings);
 
-Category.belongsToMany(Post, { through: "CategoryPost" });
-Post.belongsToMany(Category, { through: "CategoryPost" });
+Category.belongsToMany(Post, { through: CategoryPost });
+Post.belongsToMany(Category, { through: CategoryPost });
 
 const UserCommentSettings = {
     foreignKey: {
@@ -93,16 +96,24 @@ Post.hasMany(Comment, PostCommentSettings);
 Comment.belongsTo(Post, PostCommentSettings);
 
 User.belongsToMany(Post, { 
+    as: 'ownPostLikes',
     through: LikeForPost,
     foreignKey: "author"
 });
-Post.belongsToMany(User, { through: LikeForPost});
+Post.belongsToMany(User, { 
+    as: 'postLikeAuthor', 
+    through: LikeForPost
+});
 
 User.belongsToMany(Comment, { 
+    as: 'ownCommentLikes',
     through: LikeForComment,
     foreignKey: "author"
 });
-Comment.belongsToMany(User, { through: LikeForComment});
+Comment.belongsToMany(User, { 
+    as: 'commentLikeAuthor', 
+    through: LikeForComment
+});
 
 // sequelize.sync({ force: true });
 sequelize.sync({ alter: true });
@@ -115,6 +126,33 @@ sequelize.sync({ alter: true });
 //     email: 'difgssdio@gmail.com',
 //     profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
 // });
+
+// (async () => {
+//     const user = await User.findOne({
+//         where: {
+//             id: 1
+//         },
+//         include: {
+//             model: Post,
+//             as: 'ownPosts'
+//         }
+//     });
+//     console.log(user);
+//     // const posts = await user.getPosts();
+//     // console.log(posts);
+
+//     // const post = await Post.findOne({
+//     //     where: {
+//     //         id: 1
+//     //     },
+//     //     include: {
+//     //         model: User
+//     //     }
+//     // });
+//     // console.log(post);
+//     // const posts = await user.getPosts();
+//     // console.log(posts);
+// })();
 
 const db = {
     sequelize: sequelize,
