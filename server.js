@@ -25,4 +25,12 @@ app.get('/', (req, res) => {
     res.send("jdfxhkc");
 });
 
-app.listen(3000);
+// app.listen(3000);
+
+let server = app.listen(3000);
+
+server.on('connection', function(socket) {
+    socket.setTimeout(30 * 1000); 
+    server.keepAliveTimeout = 30000; 
+    server.headersTimeout = 31000; 
+});

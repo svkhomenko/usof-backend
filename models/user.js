@@ -1,7 +1,9 @@
 const { DataTypes } = require("sequelize");
 const bcrypt  = require("bcrypt");
+const path = require("path");
+const fs = require("fs");
 
-const setPicturePath = require("./setPicturePath");
+// const setPicturePath = require("./setPicturePath");
 
 module.exports = function initUser (sequelize) {
     const User = sequelize.define("user", {
@@ -47,22 +49,42 @@ module.exports = function initUser (sequelize) {
             }
         },
         profilePicture: {
-            type: DataTypes.BLOB("long"),
+            type: DataTypes.VIRTUAL,
+            // type: DataTypes.BLOB("long"),
+            // get() {
+            //     const rawValue = this.getDataValue("profilePicture");
+            //     return rawValue ? Buffer.from(rawValue, "binary").toString("base64") : null; 
+            // }
             get() {
-                const rawValue = this.getDataValue("profilePicture");
-                return rawValue ? Buffer.from(rawValue, "binary").toString("base64") : null; 
+                let fileName = this.getDataValue("picturePath");
+
+                if (fileName) {
+                    const filePath = path.resolve("uploads", fileName);
+                    let file;
+                    try {
+                        file = fs.readFileSync(filePath);
+                    }
+                    catch(error) {
+                        console.log('setter picturePath imageFromPost', error);
+                        return null;
+                    }
+
+                    return file;
+                }
+                return null;
             }
         },
         picturePath: {
-            type: DataTypes.VIRTUAL,
-            set(value) {
-                setPicturePath(this, value, "profilePicture")
-            }
+            // type: DataTypes.VIRTUAL,
+            type: DataTypes.STRING,
+            // set(value) {
+            //     setPicturePath(this, value, "profilePicture")
+            // }
         },
-        rating: {
-            type: DataTypes.VIRTUAL,
-            // get: getRating
-        },
+        // rating: {
+        //     type: DataTypes.VIRTUAL,
+        //     // get: getRating
+        // },
         role: {
             type: DataTypes.ENUM('admin', 'user'),
             allowNull: false,
@@ -78,9 +100,9 @@ module.exports = function initUser (sequelize) {
                     instance.dataValues.password = bcrypt.hashSync(instance.dataValues.password, salt);
                 }
 
-                if (!(instance.dataValues.profilePicture instanceof Buffer)) {
-                    instance.dataValues.profilePicture = instance._previousDataValues.profilePicture;
-                }
+                // if (!(instance.dataValues.profilePicture instanceof Buffer)) {
+                //     instance.dataValues.profilePicture = instance._previousDataValues.profilePicture;
+                // }
             }
         }
     });

@@ -14,27 +14,52 @@ const CategoryPost = db.sequelize.models.categoryPost;
 const LikeForPost = db.sequelize.models.likeForPost;
 const LikeForComment = db.sequelize.models.likeForComment; 
 
+// class UploadProvider extends BaseProvider {
+//     constructor() {
+//         super('uploads');
+//     }
+
+//     async upload(file, key) {
+//         const filePath = process.platform === "win32" ? this.path(key) : this.path(key).slice(1); 
+//         await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+//         await move(file.path, filePath, { overwrite: true });
+//     }
+
+//     delete(key, bucket) {
+//     }
+
+//     path(key, bucket) {
+//         return process.platform === "win32"
+//         ? `${path.join(bucket || this.bucket, key)}`
+//         : `/${path.join(bucket || this.bucket, key)}`;
+//     }
+// }
+
 class UploadProvider extends BaseProvider {
     constructor() {
         super('uploads');
+        if (!fs.existsSync('uploads')) {
+            fs.mkdirSync('uploads');
+        }
     }
-
+    
     async upload(file, key) {
-        // console.log('upload', file, key);
-        const filePath = process.platform === "win32" ? this.path(key) : this.path(key).slice(1); 
+        console.log('upload');
+        const filePath = process.platform === "win32" ? this.path(key) : this.path(key).slice(1);
         await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
         await move(file.path, filePath, { overwrite: true });
     }
-
-    delete(key, bucket) {
-        // console.log('delete', key, bucket);
+    
+    async delete(key, bucket) {
+        console.log('delete');
+        await fs.promises.unlink(process.platform === "win32" ? this.path(key, bucket) : this.path(key, bucket).slice(1));
     }
-
+    
     path(key, bucket) {
-        // console.log('path', key, bucket);
+        console.log('path');
         return process.platform === "win32"
-        ? `${path.join(bucket || this.bucket, key)}`
-        : `/${path.join(bucket || this.bucket, key)}`;
+            ? `${path.join(bucket || this.bucket, key)}`
+            : `/${path.join(bucket || this.bucket, key)}`;
     }
 }
 
@@ -42,15 +67,8 @@ module.exports = [
     {
         resource: User,
         options: {
-            listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role'],
-            // actions: {
-            //     new: {
-            //         before: hashPassword
-            //     },
-            //     edit: {
-            //         before: hashPassword
-            //     }
-            // },
+            // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role'],
+            // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role'],
             properties: {
                 email: {
                     isTitle: false
@@ -71,6 +89,28 @@ module.exports = [
                         list: AdminJS.bundle('../components/avatar_list.js')
                     }
                 }
+            },
+            actions: {
+                new: {
+                    before(r) {
+                        console.log('before');
+                        return r;
+                    },
+                    after(r) {
+                        console.log('after');
+                        return r;
+                    }
+                },
+                edit: {
+                    before(r) {
+                        console.log('before', r);
+                        return r;
+                    },
+                    after(r) {
+                        console.log('after');
+                        return r;
+                    }
+                }
             }
         },
         features: [
@@ -79,15 +119,14 @@ module.exports = [
                 properties: {
                     file: 'profilePicture',
                     key: 'picturePath', 
-                    mimeType: 'mimeType',
-                    // uploadPath: function (record, filename) {
-                    //     // console.log('uploadPath', record, filename);
-                    //     // return `${record.id()}/${filename}`;
-                    //     return 'ee';
-                    // }
+                    mimeType: 'mimeType'
                 },
                 validation: {
                     mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
+                },
+                uploadPath: (record, filename) => {
+                    console.log('uploadPath', record, filename);
+                    return `${record.id()}${Date.now()}-${filename}`;
                 }
             })
         ]
@@ -115,50 +154,6 @@ module.exports = [
                 }
             }
         },
-        // actions: {
-        //     new: {
-        //         before: hashPassword
-        //     },
-        //     edit: {
-        //         before: hashPassword
-        //     }
-        // },
-        // actions: {
-        //     edit: {
-        //         before: async function (response) {
-        //             console.log(response);
-        //             return response;
-        //             // try {
-        //             //     await LikeForPost.create({
-        //             //         author: response.record.params.author,
-        //             //         postId: response.record.params.postId,
-        //             //         publishDate: response.record.params.publishDate,
-        //             //         type: response.record.params.type
-        //             //     });
-        //             // }
-        //             // catch(error) {
-        //             //     let message = 'There are validation errors - check them out below';
-        //             //     let record = response.record;
-        //             //     if (error.original && error.original.code === 'ER_DUP_ENTRY') {
-        //             //         message = 'PRIMARY must be unique';
-        //             //         record.errors = { PRIMARY: { message: 'PRIMARY must be unique', kind: 'not_unique' } };
-        //             //     }
-
-        //             //     return ({
-        //             //         ...response,
-        //             //         record: record,
-        //             //         notice: { message: message, type: 'error' }
-        //             //     });
-        //             // }
-
-        //             // return ({
-        //             //     ...response,
-        //             //     redirectUrl: '/admin/resources/likeForPosts',
-        //             //     notice: { message: 'Successfully created a new record', type: 'success' }
-        //             // });
-        //         }
-        //     }
-        // },
         features: [
             uploadFeature({
                 provider: new UploadProvider(),
@@ -328,14 +323,15 @@ async function hashPassword(request) {
     // console.log(request.files['profilePicture.0']);
 
     // request.fields.profilePicture = null;
-
-    if (!request.files[0]) {
-        request.files[0] = {
-            path: path.resolve("uploads", '1.png'),
-            name: '1.png',
-            type: 'image/png',
-        };
-    }
+    // console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+    console.log('before', request);
+    // if (!request.files[0]) {
+    //     request.files[0] = {
+    //         path: path.resolve("uploads", '1.png'),
+    //         name: '1.png',
+    //         type: 'image/png',
+    //     };
+    // }
 
 
     // const filePath = path.resolve("uploads", 'avatar.png');

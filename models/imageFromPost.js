@@ -11,11 +11,10 @@ module.exports = function initImageFromPost (sequelize) {
         },
         image: {
             type: DataTypes.BLOB("long"),
-            // allowNull: false,
-            get() {
-                const rawValue = this.getDataValue("image");
-                return rawValue ? Buffer.from(rawValue, "binary").toString("base64") : null; 
-            }
+            // get() {
+            //     const rawValue = this.getDataValue("image");
+            //     return rawValue ? Buffer.from(rawValue, "binary").toString("base64") : null; 
+            // }
         },
         picturePath: {
             type: DataTypes.VIRTUAL,
@@ -26,12 +25,12 @@ module.exports = function initImageFromPost (sequelize) {
     },
     { 
         timestamps: false,
-        hooks: {
-            beforeUpdate: (instance) => {
-                if (!(instance.dataValues.image instanceof Buffer)) {
-                    instance.dataValues.image = instance._previousDataValues.image;
-                }
-            }
-        }
+        // hooks: {
+        //     beforeUpdate: (instance) => {
+        //         if (!(instance.dataValues.image instanceof Buffer)) {
+        //             instance.dataValues.image = instance._previousDataValues.image;
+        //         }
+        //     }
+        // }
     });
 }

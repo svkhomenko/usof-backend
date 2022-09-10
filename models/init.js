@@ -115,8 +115,8 @@ Comment.belongsToMany(User, {
     through: LikeForComment
 });
 
-// sequelize.sync({ force: true });
-sequelize.sync({ alter: true });
+sequelize.sync({ force: true });
+// sequelize.sync({ alter: true });
 // sequelize.sync();
 
 // User.create({
@@ -132,26 +132,12 @@ sequelize.sync({ alter: true });
 //         where: {
 //             id: 1
 //         },
-//         include: {
-//             model: Post,
-//             as: 'ownPosts'
-//         }
+//         // include: {
+//         //     model: Post,
+//         //     as: 'ownPosts'
+//         // }
 //     });
 //     console.log(user);
-//     // const posts = await user.getPosts();
-//     // console.log(posts);
-
-//     // const post = await Post.findOne({
-//     //     where: {
-//     //         id: 1
-//     //     },
-//     //     include: {
-//     //         model: User
-//     //     }
-//     // });
-//     // console.log(post);
-//     // const posts = await user.getPosts();
-//     // console.log(posts);
 // })();
 
 const db = {
