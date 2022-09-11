@@ -5,6 +5,9 @@ const fs = require("fs");
 const { move } = require("fs-extra");
 const path = require("path");
 const db = require("./init.js");
+const passwordFeature = require('@adminjs/passwords');
+const { ValidationError } = require('adminjs');
+const bcrypt  = require("bcrypt");
 
 const User = db.sequelize.models.user; 
 const Post = db.sequelize.models.post; 
@@ -44,30 +47,31 @@ class UploadProvider extends BaseProvider {
     }
     
     async upload(file, key) {
-        console.log('upload');
+        // console.log('upload');
         const filePath = process.platform === "win32" ? this.path(key) : this.path(key).slice(1);
         await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
         await move(file.path, filePath, { overwrite: true });
     }
     
     async delete(key, bucket) {
-        console.log('delete');
+        // console.log('delete');
         await fs.promises.unlink(process.platform === "win32" ? this.path(key, bucket) : this.path(key, bucket).slice(1));
     }
     
     path(key, bucket) {
-        console.log('path');
+        // console.log('path');
         return process.platform === "win32"
             ? `${path.join(bucket || this.bucket, key)}`
             : `/${path.join(bucket || this.bucket, key)}`;
     }
 }
 
+
 module.exports = [
     {
         resource: User,
         options: {
-            // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role'],
+            listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role'],
             // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role'],
             properties: {
                 email: {
@@ -75,6 +79,9 @@ module.exports = [
                 },
                 login: {
                     isTitle: true
+                },
+                encryptedPassword: {
+                    isVisible: { list: false, filter: false, show: false, edit: false }
                 },
                 picturePath: {
                     isVisible: { list: false, filter: false, show: false, edit: false }
@@ -92,26 +99,34 @@ module.exports = [
             },
             actions: {
                 new: {
-                    before(r) {
-                        console.log('before');
-                        return r;
-                    },
-                    after(r) {
-                        console.log('after');
-                        return r;
-                    }
+                    before: validatePassword
                 },
                 edit: {
-                    before(r) {
-                        console.log('before', r);
-                        return r;
-                    },
-                    after(r) {
-                        console.log('after');
-                        return r;
-                    }
+                    before: validatePassword
                 }
-            }
+            },
+            // actions: {
+            //     new: {
+            //         before(r) {
+            //             console.log('before');
+            //             return r;
+            //         },
+            //         after(r) {
+            //             console.log('after');
+            //             return r;
+            //         }
+            //     },
+            //     edit: {
+            //         before(r) {
+            //             console.log('before', r);
+            //             return r;
+            //         },
+            //         after(r) {
+            //             console.log('after');
+            //             return r;
+            //         }
+            //     }
+            // }
         },
         features: [
             uploadFeature({
@@ -125,16 +140,50 @@ module.exports = [
                     mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
                 },
                 uploadPath: (record, filename) => {
-                    console.log('uploadPath', record, filename);
+                    // console.log('uploadPath', record, filename);
                     return `${record.id()}${Date.now()}-${filename}`;
                 }
+            }),
+            passwordFeature({
+                properties: {
+                    encryptedPassword: 'encryptedPassword'
+                },
+                hash: hashPassword
             })
         ]
     },
     {
         resource: Post,
         options: {
-            listProperties: ['id', 'author', 'title', 'publishDate', 'status', 'content']
+            listProperties: ['id', 'author', 'title', 'publishDate', 'status', 'content'],
+            properties: {
+                author: {
+                    isVisible: { list: true, filter: true, show: true, edit: false }
+                }
+            },
+            actions: {
+                new: {
+                    before: async (request, { currentAdmin }) => {
+                        request.payload = {
+                            ...request.payload,
+                            author: currentAdmin.id
+                        };
+                        return request;
+                    }
+                },
+                edit: {
+                    before: async (request, { currentAdmin }) => {
+                        if (request.method === 'post' && request.payload.author != currentAdmin.id) {
+                            request.payload = {
+                                ...request.payload,
+                                title: undefined,
+                                content: undefined
+                            };
+                        }
+                        return request;
+                    }
+                }
+            }
         }
     },
     {
@@ -164,6 +213,10 @@ module.exports = [
                 },
                 validation: {
                     mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
+                },
+                uploadPath: (record, filename) => {
+                    console.log('uploadPath', record, filename);
+                    return `${record.id()}${Date.now()}-posts-${filename}`;
                 }
             })
         ]
@@ -318,43 +371,96 @@ module.exports = [
     }
 ];
 
-async function hashPassword(request) {
-    // console.log("request", request.fields, request.payload, request.files);
-    // console.log(request.files['profilePicture.0']);
+function hashPassword(password) {
+    let salt = bcrypt.genSaltSync(10);
+    return bcrypt.hashSync(password, salt);
+}
 
-    // request.fields.profilePicture = null;
-    // console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
-    console.log('before', request);
-    // if (!request.files[0]) {
-    //     request.files[0] = {
-    //         path: path.resolve("uploads", '1.png'),
-    //         name: '1.png',
-    //         type: 'image/png',
-    //     };
-    // }
+async function validatePassword (request) {
+    const password = request.fields.password;
+    const encryptedPassword = request.payload.encryptedPassword;
 
+    if (request.method !== 'post' || (password == undefined && encryptedPassword)) {
+        return request;
+    }
 
-    // const filePath = path.resolve("uploads", 'avatar.png');
-    // fs.stat(filePath, function(err, stats) {
-    //     if (err) {
-    //         console.log('stat err', err);
-    //     }
-    //     else {
-    //         console.log('stat', stats);
-    //     }
-    // });
-    
-    // const fileData = new LocalFileData(filePath);
-    // console.log(constructFileFromLocalFileData(fileData));
+    if (!/^[a-zA-Z0-9]+$/.test(password)) {
+        throw new ValidationError({
+            password: {
+                message: "Password must containt only a-z, A-Z, 0-9"
+            },
+        }, {
+            message: 'There are validation errors - check them out below'
+        });
+    }
+    else if (!/(?=.*\d)/.test(password)) {
+        throw new ValidationError({
+            password: {
+                message: "Password must containt at least one digit"
+            },
+        }, {
+            message: 'There are validation errors - check them out below'
+        });
+    }
+    else if (!/(?=.*[a-z])/.test(password)) {
+        throw new ValidationError({
+            password: {
+                message: "Password must containt at least one lowercase letter"
+            },
+        }, {
+            message: 'There are validation errors - check them out below'
+        });
+    }
+    else if (!/(?=.*[A-Z])/.test(password)) {
+        throw new ValidationError({
+            password: {
+                message: "Password must containt at least one uppercase letter"
+            },
+        }, {
+            message: 'There are validation errors - check them out below'
+        });
+    }
 
-    // if (request.files)
-    // if (request.payload.password) {
-    //     let salt = bcrypt.genSaltSync(10);
-    //     request.payload = {
-    //         ...request.payload,
-    //         password: await bcrypt.hash(request.payload.password, salt)
-    //     }
-    // }
     return request;
 }
+
+// async function hashPassword(request) {
+//     // console.log("request", request.fields, request.payload, request.files);
+//     // console.log(request.files['profilePicture.0']);
+
+//     // request.fields.profilePicture = null;
+//     // console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+//     console.log('before', request);
+//     // if (!request.files[0]) {
+//     //     request.files[0] = {
+//     //         path: path.resolve("uploads", '1.png'),
+//     //         name: '1.png',
+//     //         type: 'image/png',
+//     //     };
+//     // }
+
+
+//     // const filePath = path.resolve("uploads", 'avatar.png');
+//     // fs.stat(filePath, function(err, stats) {
+//     //     if (err) {
+//     //         console.log('stat err', err);
+//     //     }
+//     //     else {
+//     //         console.log('stat', stats);
+//     //     }
+//     // });
+    
+//     // const fileData = new LocalFileData(filePath);
+//     // console.log(constructFileFromLocalFileData(fileData));
+
+//     // if (request.files)
+//     // if (request.payload.password) {
+//     //     let salt = bcrypt.genSaltSync(10);
+//     //     request.payload = {
+//     //         ...request.payload,
+//     //         password: await bcrypt.hash(request.payload.password, salt)
+//     //     }
+//     // }
+//     return request;
+// }
 

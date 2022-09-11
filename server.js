@@ -1,6 +1,7 @@
 const AdminJS = require('adminjs');
 const AdminJSExpress = require('@adminjs/express');
 const AdminJSSequelize = require('@adminjs/sequelize');
+const bcrypt  = require("bcrypt");
 const express = require("express");
 const app = express();
 
@@ -18,12 +19,30 @@ const adminJs = new AdminJS({
     rootPath: '/admin',
 });
 
-const router = AdminJSExpress.buildRouter(adminJs);
-app.use(adminJs.options.rootPath, router);
+// const adminJsrouter = AdminJSExpress.buildRouter(adminJs);
 
-app.get('/', (req, res) => {
-    res.send("jdfxhkc");
+const adminJsrouter = AdminJSExpress.buildAuthenticatedRouter(adminJs, {
+    authenticate: async (email, password) => {
+        const user = await db.sequelize.models.user.findOne({ where: { email: email } });
+        if (user && user.role === 'admin') {
+            const matched = await bcrypt.compare(password, user.encryptedPassword);
+            if (matched) {
+                return user;
+            }
+        }
+        return false;
+    },
+    cookiePassword: 'some-secret-password-used-to-secure-cookie'
+}, null, {
+    resave: true,
+    saveUninitialized: true
 });
+
+app.use(adminJs.options.rootPath, adminJsrouter);
+
+// app.get('/', (req, res) => {
+//     res.send("jdfxhkc");
+// });
 
 // app.listen(3000);
 

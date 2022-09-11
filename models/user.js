@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const bcrypt  = require("bcrypt");
+// const bcrypt  = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
 
@@ -22,13 +22,13 @@ module.exports = function initUser (sequelize) {
                 is: /^[a-zA-Z0-9 ]+$/
             }
         },
-        password: {
+        encryptedPassword: {
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
                 notEmpty: true,
-                len: [2, 50],
-                validatePassword
+                // len: [2, 50],
+                // validatePassword
             }
         },
         fullName: {
@@ -65,7 +65,7 @@ module.exports = function initUser (sequelize) {
                         file = fs.readFileSync(filePath);
                     }
                     catch(error) {
-                        console.log('setter picturePath imageFromPost', error);
+                        console.log('setter picturePath user', error);
                         return null;
                     }
 
@@ -93,18 +93,22 @@ module.exports = function initUser (sequelize) {
     },
     {
         timestamps: false,
-        hooks: {
-            beforeUpdate: (instance) => {
-                if (instance.dataValues.password !== instance._previousDataValues.password) {
-                    let salt = bcrypt.genSaltSync(10);
-                    instance.dataValues.password = bcrypt.hashSync(instance.dataValues.password, salt);
-                }
+        // hooks: {
+        //     beforeUpdate: (instance) => {
+        //         console.log('beforeUpdate');
 
-                // if (!(instance.dataValues.profilePicture instanceof Buffer)) {
-                //     instance.dataValues.profilePicture = instance._previousDataValues.profilePicture;
-                // }
-            }
-        }
+        //         if (instance.dataValues.password !== instance._previousDataValues.password) {
+        //             let salt = bcrypt.genSaltSync(10);
+        //             instance.dataValues.password = bcrypt.hashSync(instance.dataValues.password, salt);
+        //         }
+
+        //         console.log(instance.dataValues, instance._previousDataValues);
+
+        //         // if (!(instance.dataValues.profilePicture instanceof Buffer)) {
+        //         //     instance.dataValues.profilePicture = instance._previousDataValues.profilePicture;
+        //         // }
+        //     }
+        // }
     });
 
     // User.prototype.getRating = function() {
@@ -137,17 +141,17 @@ module.exports = function initUser (sequelize) {
     // }
 }
 
-function validatePassword(password) {
-    if (!/^[a-zA-Z0-9]+$/.test(password)) {
-        throw new Error("Password must containt only a-z, A-Z, 0-9");
-    }
-    if (!/(?=.*\d)/.test(password)) {
-        throw new Error("Password must containt at least one digit");
-    }
-    if (!/(?=.*[a-z])/.test(password)) {
-        throw new Error("Password must containt at least one lowercase letter");
-    }
-    if (!/(?=.*[A-Z])/.test(password)) {
-        throw new Error("Password must containt at least one uppercase letter");
-    }
-}
+// function validatePassword(password) {
+//     if (!/^[a-zA-Z0-9]+$/.test(password)) {
+//         throw new Error("Password must containt only a-z, A-Z, 0-9");
+//     }
+//     if (!/(?=.*\d)/.test(password)) {
+//         throw new Error("Password must containt at least one digit");
+//     }
+//     if (!/(?=.*[a-z])/.test(password)) {
+//         throw new Error("Password must containt at least one lowercase letter");
+//     }
+//     if (!/(?=.*[A-Z])/.test(password)) {
+//         throw new Error("Password must containt at least one uppercase letter");
+//     }
+// }

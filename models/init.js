@@ -115,16 +115,20 @@ Comment.belongsToMany(User, {
     through: LikeForComment
 });
 
-sequelize.sync({ force: true });
-// sequelize.sync({ alter: true });
+// sequelize.sync({ force: true });
+sequelize.sync({ alter: true });
 // sequelize.sync();
+
+// const bcrypt  = require("bcrypt");
+// let salt = bcrypt.genSaltSync(10);
 
 // User.create({
 //     login: 'aasa',
-//     password: 'dfsdg',
+//     encryptedPassword: bcrypt.hashSync('user1Q', salt),
 //     fullName: 'sfdsgtg',
-//     email: 'difgssdio@gmail.com',
-//     profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
+//     email: 'qqq@gmail.com',
+//     role: 'admin'
+//     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
 // });
 
 // (async () => {
