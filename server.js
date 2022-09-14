@@ -9,7 +9,7 @@ app.use(express.static('uploads'));
 app.use('/uploads', express.static('uploads'));
 
 const db = require("./models/init.js");
-const adminJsResources = require("./models/resources");
+const adminJsResources = require("./models/resources/resources");
 
 AdminJS.registerAdapter(AdminJSSequelize);
 

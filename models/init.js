@@ -116,8 +116,8 @@ Comment.belongsToMany(User, {
 });
 
 // sequelize.sync({ force: true });
-sequelize.sync({ alter: true });
-// sequelize.sync();
+// sequelize.sync({ alter: true });
+sequelize.sync();
 
 // const bcrypt  = require("bcrypt");
 // let salt = bcrypt.genSaltSync(10);
@@ -131,7 +131,22 @@ sequelize.sync({ alter: true });
 //     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
 // });
 
-// (async () => {
+
+// User.create({
+//     login: 'notAdmin',
+//     encryptedPassword: bcrypt.hashSync('usxcvvcer1Q', salt),
+//     fullName: 'sfddfsgtg',
+//     email: 'qdsfqq@gmail.com',
+//     role: 'user'
+//     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
+// });
+    
+// ImageFromPost.create({
+//     picturePath: '151663171830063-posts-logo.png',
+//     postId: 2
+// });
+
+    // (async () => {
 //     const user = await User.findOne({
 //         where: {
 //             id: 1

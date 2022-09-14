@@ -2,7 +2,7 @@ import React from 'react';
 import { Buffer } from "buffer";
 
 const Avatar = (props) => {
-    console.log("props", props);
+    // console.log("props", props);
     let src = "/avatar.png";
     if (props.record.params.profilePicture) {
         // src = 'data:image/png;base64,' + props.record.params.profilePicture;

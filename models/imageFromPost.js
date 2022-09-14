@@ -43,7 +43,7 @@ module.exports = function initImageFromPost (sequelize) {
             // set(value) {
             //     setPicturePath(this, value, "image")
             // }
-        },
+        }
     },
     { 
         timestamps: false,

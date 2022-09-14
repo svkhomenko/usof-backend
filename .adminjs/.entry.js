@@ -11,15 +11,13 @@ import Component5 from '../node_modules/@adminjs/upload/src/features/upload-file
 AdminJS.UserComponents.Component5 = Component5
 import Component6 from '../node_modules/@adminjs/upload/src/features/upload-file/components/show'
 AdminJS.UserComponents.Component6 = Component6
-import Component7 from '../components/post_title_edit'
+import Component7 from '../components/avatar_show'
 AdminJS.UserComponents.Component7 = Component7
-import Component8 from '../components/avatar_show'
+import Component8 from '../components/avatar_list'
 AdminJS.UserComponents.Component8 = Component8
-import Component9 from '../components/avatar_list'
+import Component9 from '../node_modules/@adminjs/upload/src/features/upload-file/components/edit'
 AdminJS.UserComponents.Component9 = Component9
-import Component10 from '../node_modules/@adminjs/upload/src/features/upload-file/components/edit'
+import Component10 from '../node_modules/@adminjs/upload/src/features/upload-file/components/list'
 AdminJS.UserComponents.Component10 = Component10
-import Component11 from '../node_modules/@adminjs/upload/src/features/upload-file/components/list'
+import Component11 from '../node_modules/@adminjs/upload/src/features/upload-file/components/show'
 AdminJS.UserComponents.Component11 = Component11
-import Component12 from '../node_modules/@adminjs/upload/src/features/upload-file/components/show'
-AdminJS.UserComponents.Component12 = Component12

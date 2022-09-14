@@ -3,7 +3,7 @@ import { Buffer } from "buffer";
 import { ValueGroup, Label } from '@adminjs/design-system';
 
 const Avatar = (props) => {
-    console.log("props", props);
+    // console.log("props", props);
     let src = "/avatar.png";
     if (props.record.params.profilePicture) {
         // src = 'data:imagSe/png;base64,' + props.record.params.profilePicture;
