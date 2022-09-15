@@ -7,8 +7,8 @@ const bcrypt  = require("bcrypt");
 const UploadProvider = require('./UploadProvider');
 
 exports.options = {
-    listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role'],
-    // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role'],
+    listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role', 'status'],
+    // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role', 'status'],
     properties: {
         email: {
             isTitle: false
@@ -23,6 +23,9 @@ exports.options = {
             isVisible: { list: false, filter: false, show: false, edit: false }
         },
         rating: {
+            isVisible: { list: true, filter: true, show: true, edit: false }
+        },
+        status: {
             isVisible: { list: true, filter: true, show: true, edit: false }
         },
         profilePicture: {
@@ -72,7 +75,7 @@ function hashPassword(password) {
     return bcrypt.hashSync(password, salt);
 }
 
-async function validatePassword (request) {
+async function validatePassword(request) {
     const password = request.fields.password;
     const encryptedPassword = request.payload.encryptedPassword;
 

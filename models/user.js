@@ -89,6 +89,11 @@ module.exports = function initUser (sequelize) {
             type: DataTypes.ENUM('admin', 'user'),
             allowNull: false,
             defaultValue: "user"
+        },
+        status: {
+            type: DataTypes.ENUM('pending', 'active'),
+            allowNull: false,
+            defaultValue: "pending"
         }
     },
     {

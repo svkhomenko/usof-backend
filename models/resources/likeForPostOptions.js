@@ -6,14 +6,21 @@ exports.options = {
     listProperties: ['author', 'postId', 'publishDate', 'type'],
     properties: {
         author: {
-            isVisible: { list: true, filter: true, show: true, edit: true }
+            isVisible: { list: true, filter: true, show: true, edit: false }
         },
         postId: {
-            isVisible: { list: true, filter: true, show: true, edit: true }
+            isVisible: { list: true, filter: true, show: true, edit: true}
         }
     },
     actions: {
         new: {
+            before: async (request, { currentAdmin }) => {
+                request.payload = {
+                    ...request.payload,
+                    author: currentAdmin.id
+                };
+                return request;
+            },
             after: async function (response) {
                 try {
                     await LikeForPost.create({
@@ -44,6 +51,9 @@ exports.options = {
                     notice: { message: 'Successfully created a new record', type: 'success' }
                 });
             }
+        },
+        edit: {
+            isAccessible: false
         }
     }
 };

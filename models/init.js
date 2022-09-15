@@ -127,7 +127,8 @@ sequelize.sync();
 //     encryptedPassword: bcrypt.hashSync('user1Q', salt),
 //     fullName: 'sfdsgtg',
 //     email: 'qqq@gmail.com',
-//     role: 'admin'
+//     role: 'admin',
+//     status: 'active',
 //     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
 // });
 

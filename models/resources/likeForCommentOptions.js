@@ -6,7 +6,7 @@ exports.options = {
     listProperties: ['author', 'commentId', 'publishDate', 'type'],
     properties: {
         author: {
-            isVisible: { list: true, filter: true, show: true, edit: true }
+            isVisible: { list: true, filter: true, show: true, edit: false }
         },
         commentId: {
             isVisible: { list: true, filter: true, show: true, edit: true }
@@ -14,6 +14,13 @@ exports.options = {
     },
     actions: {
         new: {
+            before: async (request, { currentAdmin }) => {
+                request.payload = {
+                    ...request.payload,
+                    author: currentAdmin.id
+                };
+                return request;
+            },
             after: async function (response) {
                 try {
                     await LikeForComment.create({
@@ -44,6 +51,9 @@ exports.options = {
                     notice: { message: 'Successfully created a new record', type: 'success' }
                 });
             }
+        },
+        edit: {
+            isAccessible: false
         }
     }
 };
