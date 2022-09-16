@@ -4,6 +4,7 @@ const postOptions = require('./postOptions');
 const imageFromPostOptions = require('./imageFromPostOptions');
 const categoryPostOptions = require('./categoryPostOptions');
 const commentOptions = require('./commentOptions');
+const imageFromCommentOptions = require('./imageFromCommentOptions');
 const likeForPostOptions = require('./likeForPostOptions');
 const likeForCommentOptions = require('./likeForCommentOptions');
 
@@ -13,6 +14,7 @@ const ImageFromPost = db.sequelize.models.imageFromPost;
 const Category = db.sequelize.models.category; 
 const CategoryPost = db.sequelize.models.categoryPost; 
 const Comment = db.sequelize.models.comment; 
+const ImageFromComment = db.sequelize.models.imageFromComment;
 const LikeForPost = db.sequelize.models.likeForPost;
 const LikeForComment = db.sequelize.models.likeForComment; 
 
@@ -44,6 +46,11 @@ module.exports = [
     {
         resource: Comment,
         options: commentOptions.options 
+    },
+    {
+        resource: ImageFromComment,
+        options: imageFromCommentOptions.options,
+        features: imageFromCommentOptions.features
     },
     {
         resource: LikeForPost,

@@ -2,8 +2,8 @@ const { DataTypes } = require("sequelize");
 const path = require("path");
 const fs = require("fs");
 
-module.exports = function initImageFromPost(sequelize) {
-    const ImageFormPost = sequelize.define("imageFromPost", {
+module.exports = function initImageFromComment(sequelize) {
+    const ImageFormComment = sequelize.define("imageFromComment", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

@@ -1,5 +1,5 @@
 exports.options = {
-    listProperties: ['id', 'content', 'postId', 'author', 'status', 'publishDate'],
+    listProperties: ['id', 'content', 'postId', 'repliedCommentId', 'author', 'status', 'publishDate'],
     properties: {
         id: {
             isTitle: false

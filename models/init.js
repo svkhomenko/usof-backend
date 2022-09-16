@@ -9,6 +9,7 @@ const initImageFromPost = require("./imageFromPost");
 const initCategory = require("./category");
 const initCategoryPost = require("./categoryPost");
 const initComment = require("./comment");
+const initImageFromComment = require("./imageFromComment");
 const initLikeForPost = require("./likeForPost");
 const initLikeForComment = require("./likeForComment");
 
@@ -38,6 +39,7 @@ initImageFromPost(sequelize);
 initCategory(sequelize);
 initCategoryPost(sequelize);
 initComment(sequelize);
+initImageFromComment(sequelize);
 initLikeForPost(sequelize);
 initLikeForComment(sequelize);
 
@@ -47,6 +49,7 @@ const ImageFromPost = sequelize.models.imageFromPost;
 const Category = sequelize.models.category;
 const CategoryPost = sequelize.models.categoryPost;
 const Comment = sequelize.models.comment;
+const ImageFromComment = sequelize.models.imageFromComment;
 const LikeForPost = sequelize.models.likeForPost;
 const LikeForComment = sequelize.models.likeForComment;
 
@@ -71,6 +74,16 @@ const PostImageSettings = {
 Post.hasMany(ImageFromPost, PostImageSettings);
 ImageFromPost.belongsTo(Post, PostImageSettings);
 
+const CommentImageSettings = {
+    foreignKey: {
+        allowNull: false
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+};
+Comment.hasMany(ImageFromComment, CommentImageSettings);
+ImageFromComment.belongsTo(Comment, CommentImageSettings);
+
 Category.belongsToMany(Post, { through: CategoryPost });
 Post.belongsToMany(Category, { through: CategoryPost });
 
@@ -82,8 +95,8 @@ const UserCommentSettings = {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 };
-User.hasMany(Comment, UserCommentSettings);
-Comment.belongsTo(User, UserCommentSettings);
+User.hasMany(Comment, { as: 'ownComments', ...UserCommentSettings});
+Comment.belongsTo(User, {  as: 'commentAuthor', ...UserCommentSettings});
 
 const PostCommentSettings = {
     foreignKey: {
@@ -94,6 +107,16 @@ const PostCommentSettings = {
 };
 Post.hasMany(Comment, PostCommentSettings);
 Comment.belongsTo(Post, PostCommentSettings);
+
+const CommentCommentSettings = {
+    foreignKey: {
+        name: 'repliedCommentId'
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+};
+Comment.hasMany(Comment, { as: 'replies', ...CommentCommentSettings});
+Comment.belongsTo(Comment, {  as: 'repliedComment', ...CommentCommentSettings});
 
 User.belongsToMany(Post, { 
     as: 'ownPostLikes',
@@ -115,22 +138,23 @@ Comment.belongsToMany(User, {
     through: LikeForComment
 });
 
-// sequelize.sync({ force: true });
+// sequelize.sync({ force: true })
+// .then(() => {
+//     const bcrypt  = require("bcrypt");
+//     let salt = bcrypt.genSaltSync(10);
+
+//     User.create({
+//         login: 'aasa',
+//         encryptedPassword: bcrypt.hashSync('user1Q', salt),
+//         fullName: 'sfdsgtg',
+//         email: 'qqq@gmail.com',
+//         role: 'admin',
+//         status: 'active',
+//         // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
+//     });
+// });
 // sequelize.sync({ alter: true });
 sequelize.sync();
-
-// const bcrypt  = require("bcrypt");
-// let salt = bcrypt.genSaltSync(10);
-
-// User.create({
-//     login: 'aasa',
-//     encryptedPassword: bcrypt.hashSync('user1Q', salt),
-//     fullName: 'sfdsgtg',
-//     email: 'qqq@gmail.com',
-//     role: 'admin',
-//     status: 'active',
-//     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
-// });
 
 
 // User.create({
@@ -147,7 +171,7 @@ sequelize.sync();
 //     postId: 2
 // });
 
-    // (async () => {
+// (async () => {
 //     const user = await User.findOne({
 //         where: {
 //             id: 1
@@ -158,6 +182,25 @@ sequelize.sync();
 //         // }
 //     });
 //     console.log(user);
+// })();
+
+// (async () => {
+//     const comment = await Comment.findAll({
+//         include: [
+//             {
+//                 model: Post
+//             },
+//             {
+//                 model: Comment,
+//                 as: 'replies'
+//             },
+//             {
+//                 model: Comment,
+//                 as: 'repliedComment'
+//             }
+//         ]
+//     });
+//     console.log(comment);
 // })();
 
 const db = {

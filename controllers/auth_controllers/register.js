@@ -1,7 +1,7 @@
 const bcrypt  = require("bcrypt");
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
-const sendConfirmToken = require('./sendConfirmToken');
+const { generateToken } = require('./sendEmail');
 
 const User = db.sequelize.models.user;
 
@@ -68,7 +68,7 @@ async function validateEmail(email) {
 
 async function register(req, res) {
     const data = req.body;
-
+    
     try {
         checkPasswordConfirmation(data);
         await validatePassword(data.password);
@@ -83,32 +83,24 @@ async function register(req, res) {
             encryptedPassword: bcrypt.hashSync(data.password, salt),
             fullName: data.fullName,
             email: data.email
-        })
-        .then((data) => {
-            res.status(201).send();
-            sendConfirmToken(data.email, data.login, data.password);
         });
+
+        res.status(201).json({ confirmTokenForEmail: await generateToken({ email: data.email }) });
     }
     catch(err) {
         if (err instanceof ValidationError) {
             res.status(err.status)
-                .json({
-                    message: err.message
-                });
+                .json({ message: err.message });
         }
         else if (err.name == 'SequelizeValidationError') {
             res.status(400)
-                .json({
-                    message: err.errors[0].message
-                });
+                .json({ message: err.errors[0].message });
         }
         else {
             console.log('err', err);
 
             res.status(400)
-                .json({
-                    message: err
-                });
+                .json({ message: err });
         } 
     }    
 }

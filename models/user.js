@@ -1,11 +1,8 @@
 const { DataTypes } = require("sequelize");
-// const bcrypt  = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
 
-// const setPicturePath = require("./setPicturePath");
-
-module.exports = function initUser (sequelize) {
+module.exports = function initUser(sequelize) {
     const User = sequelize.define("user", {
         id: {
             type: DataTypes.INTEGER,
@@ -27,8 +24,6 @@ module.exports = function initUser (sequelize) {
             allowNull: false,
             validate: {
                 notEmpty: true,
-                // len: [2, 50],
-                // validatePassword
             }
         },
         fullName: {
@@ -50,11 +45,6 @@ module.exports = function initUser (sequelize) {
         },
         profilePicture: {
             type: DataTypes.VIRTUAL,
-            // type: DataTypes.BLOB("long"),
-            // get() {
-            //     const rawValue = this.getDataValue("profilePicture");
-            //     return rawValue ? Buffer.from(rawValue, "binary").toString("base64") : null; 
-            // }
             get() {
                 let fileName = this.getDataValue("picturePath");
 
@@ -75,11 +65,7 @@ module.exports = function initUser (sequelize) {
             }
         },
         picturePath: {
-            // type: DataTypes.VIRTUAL,
-            type: DataTypes.STRING,
-            // set(value) {
-            //     setPicturePath(this, value, "profilePicture")
-            // }
+            type: DataTypes.STRING
         },
         // rating: {
         //     type: DataTypes.VIRTUAL,
@@ -98,22 +84,6 @@ module.exports = function initUser (sequelize) {
     },
     {
         timestamps: false,
-        // hooks: {
-        //     beforeUpdate: (instance) => {
-        //         console.log('beforeUpdate');
-
-        //         if (instance.dataValues.password !== instance._previousDataValues.password) {
-        //             let salt = bcrypt.genSaltSync(10);
-        //             instance.dataValues.password = bcrypt.hashSync(instance.dataValues.password, salt);
-        //         }
-
-        //         console.log(instance.dataValues, instance._previousDataValues);
-
-        //         // if (!(instance.dataValues.profilePicture instanceof Buffer)) {
-        //         //     instance.dataValues.profilePicture = instance._previousDataValues.profilePicture;
-        //         // }
-        //     }
-        // }
     });
 
     // User.prototype.getRating = function() {
