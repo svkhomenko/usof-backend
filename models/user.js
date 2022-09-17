@@ -84,36 +84,17 @@ module.exports = function initUser(sequelize) {
     },
     {
         timestamps: false,
+        hooks: {
+            beforeDestroy: async function (instance, options) {
+                if (instance.picturePath) {
+                    const pictureFilePath = path.resolve("uploads", "instance.picturePath");
+                    if (fs.existsSync(pictureFilePath)) {
+                        await fs.promises.unlink(pictureFilePath);
+                    }
+                }
+            }
+        }
     });
-
-    // User.prototype.getRating = function() {
-    //     // let bio = this.getDataValue('bio');
-    //     // if (bio) {
-    //     //     let bestFriend = await db.models.User.findById(this.getDataValue('BestFriendId'))
-    //     //     if(bestFriend){
-    //     //         bio += ` Best friend: ${bestFriend.name}.`;
-    //     //     }
-    //     //     return bio;
-    //     // } else {
-    //     //     return '';
-    //     // }
-    //     return 5;
-    // }
-
-    // async function getRating() {
-    //     // const User = sequelize.models.user; 
-    //     const id = this.getDataValue("id");
-    //     // const user = await User.findOne({
-    //     //     where: {
-    //     //       id: id
-    //     //     },
-    //     //     include: sequelize.models.post
-    //     // });
-    //     // // const posts = await user.getPosts();
-    //     // // console.log(posts);
-    //     // console.log(user);
-    //     return id;
-    // }
 }
 
 // function validatePassword(password) {

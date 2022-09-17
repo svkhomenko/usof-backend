@@ -9,7 +9,7 @@ const adminJsResources = require("./models/resources/resources");
 AdminJS.registerAdapter(AdminJSSequelize);
 
 const adminJs = new AdminJS({
-    databases: [db],
+    // databases: [db],
     resources: adminJsResources,
     rootPath: '/admin',
 });

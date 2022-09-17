@@ -2,15 +2,16 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
 
-const { adminJs, adminJsrouter } = require('./adminjsConnection');
-
 app.use(express.static('uploads'));
 app.use('/uploads', express.static('uploads'));
 
+const { adminJs, adminJsrouter } = require('./adminjsConnection');
 app.use(adminJs.options.rootPath, adminJsrouter);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+require('./deleteTokens')();
 
 const authRouter = require("./routes/auth_router.js");
 

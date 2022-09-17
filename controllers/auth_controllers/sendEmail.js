@@ -1,71 +1,14 @@
-const bcrypt  = require("bcrypt");
-// const jwt  = require("jsonwebtoken");
+const nodemailer = require('nodemailer');
 const path = require("path");
 const fs  = require("fs");
 const db = require("../../models/init.js");
-
-const { signJWTToken } = require('../../initJTWR');
+const { signJWTToken } = require('../tokenTools');
 
 const User = db.sequelize.models.user;
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
-
-// function generateAccessToken(payload) {
-//     return jwt.sign(payload, TOKEN_SECRET, { expiresIn: TOKEN_EXPIRE_SEC, });
-// }
-
-// async function checkErrors(data, user) {
-//     let res = {};
-
-//     if (!(user && bcrypt.compareSync(data.password, user.password))) {
-//         res.type = TYPE_ERROR;
-//         res.text = 'Login or password is invalid';
-//         return res;
-//     }
-
-//     res.type = TYPE_SUCCESS;
-//     res.text = '';
-//     // res.text = 'You are successfully logged!';
-
-//     return res; 
-// }
-
-// async function login(req, res) {
-//     const data = req.body;
-
-//     let user = await User.findOne({
-//         where: {
-//             login: data.login
-//         }
-//     }).catch(err => console.log(err));
-
-//     let result = await checkErrors(data, user);
-    
-//     if (result.type === TYPE_SUCCESS) {
-//         const token = generateAccessToken({id: user.id, nickname: user.nickname });
-//         res.cookie('token', token, {sameSite: 'Lax', maxAge: TOKEN_EXPIRE_SEC * 1000,});
-//         result.redirect = `/?id=${user.id}`;
-//     }
-
-//     res.json(result);
-// }
-
-// export default login;
-
-
-
-
-
-
-
-
-
-
-
-const nodemailer = require('nodemailer');
-const { text } = require("express");
 
 const nodemailerFilePath = path.resolve("configs", "nodemailer-config.json");
 const nodemailerOptFile = fs.readFileSync(nodemailerFilePath);

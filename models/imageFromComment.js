@@ -36,5 +36,15 @@ module.exports = function initImageFromComment(sequelize) {
     },
     { 
         timestamps: false,
+        hooks: {
+            beforeDestroy: async function (instance, options) {
+                if (instance.picturePath) {
+                    const pictureFilePath = path.resolve("uploads", "instance.picturePath");
+                    if (fs.existsSync(pictureFilePath)) {
+                        await fs.promises.unlink(pictureFilePath);
+                    }
+                }
+            }
+        }
     });
 }

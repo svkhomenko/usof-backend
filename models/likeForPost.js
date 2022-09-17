@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
-module.exports = function initLikeForPost (sequelize) {
+module.exports = function initLikeForPost(sequelize) {
     const LikeForPost = sequelize.define("likeForPost", {
         author: {
             type: DataTypes.INTEGER,
@@ -23,7 +23,11 @@ module.exports = function initLikeForPost (sequelize) {
         publishDate: {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
-            allowNull: false,
+            allowNull: false
+
+            // type: 'TIMESTAMP',
+            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            // allowNull: false
         },
         type: {
             type: DataTypes.ENUM('like', 'dislike'),

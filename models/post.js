@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
-module.exports = function initPost (sequelize) {
+module.exports = function initPost(sequelize) {
     const Post = sequelize.define("post", {
         id: {
             type: DataTypes.INTEGER,
@@ -14,7 +14,11 @@ module.exports = function initPost (sequelize) {
         publishDate: {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
-            allowNull: false,
+            allowNull: false
+
+            // type: 'TIMESTAMP',
+            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            // allowNull: false
         },
         status: {
             type: DataTypes.ENUM('active', 'inactive'),

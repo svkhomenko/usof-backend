@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 
-module.exports = function initComment (sequelize) {
+module.exports = function initComment(sequelize) {
     const Comment = sequelize.define("comment", {
         id: {
             type: DataTypes.INTEGER,
@@ -10,7 +10,11 @@ module.exports = function initComment (sequelize) {
         publishDate: {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
-            allowNull: false,
+            allowNull: false
+
+            // type: 'TIMESTAMP',
+            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            // allowNull: false
         },
         status: {
             type: DataTypes.ENUM('active', 'inactive'),

@@ -2,7 +2,7 @@
 const path = require("path");
 const fs  = require("fs");
 
-const { verifyJWTToken } = require('../../initJTWR');
+const { verifyJWTToken } = require('../tokenTools');
 
 const db = require("../../models/init.js");
 const User = db.sequelize.models.user;

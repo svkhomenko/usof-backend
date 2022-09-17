@@ -2,7 +2,7 @@
 const path = require("path");
 const fs  = require("fs");
 
-const { verifyJWTToken } = require('../../initJTWR');
+const { verifyJWTToken } = require('../tokenTools');
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
