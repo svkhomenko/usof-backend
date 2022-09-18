@@ -1,7 +1,7 @@
 const bcrypt  = require("bcrypt");
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
-const { generateToken } = require('./sendEmail');
+const { generateToken } = require('../tools/sendEmail');
 
 const User = db.sequelize.models.user;
 
@@ -26,7 +26,7 @@ async function login(req, res) {
             throw new ValidationError("Your email is not confirmed. Check your email", 403);
         }
         
-        res.status(201)
+        res.status(200)
             .json({ 
                 id: user.id,
                 login: user.login,
@@ -34,7 +34,9 @@ async function login(req, res) {
                 email: user.email,
                 role: user.role,
                 profilePicture: user.profilePicture,
-                token: await generateToken({ id: user.id, login: user.login }) 
+                rating: await user.getRating(),
+                token: await generateToken({ id: user.id, login: user.login }, "secret"),
+                status: user.status
             });
     }
     catch(err) {

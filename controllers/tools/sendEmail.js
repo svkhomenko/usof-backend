@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const path = require("path");
 const fs  = require("fs");
 const db = require("../../models/init.js");
-const { signJWTToken } = require('../tokenTools');
+const { signJWTToken } = require('../../token/tokenTools');
 
 const User = db.sequelize.models.user;
 
@@ -73,9 +73,8 @@ function sendEmail(email, subject, text, html) {
     });    
 }
 
-async function generateToken(payload) {
-    return await signJWTToken(payload, tokenOptions.secret, { expiresIn: tokenOptions.expire_sec });
-    // return jwt.sign(payload, tokenOptions.secret, { expiresIn: tokenOptions.expire_sec });
+async function generateToken(payload, secret) {
+    return await signJWTToken(payload, tokenOptions[secret], { expiresIn: tokenOptions.expire_sec });
 }
 
 module.exports = {

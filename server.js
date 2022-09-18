@@ -11,11 +11,13 @@ app.use(adminJs.options.rootPath, adminJsrouter);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-require('./deleteTokens')();
+require('./token/deleteTokens')();
 
 const authRouter = require("./routes/auth_router.js");
+const usersRouter = require("./routes/users_router.js");
 
 app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
  
 app.use(function (req, res) {
     res.status(404)

@@ -1,8 +1,7 @@
-// const jwt  = require("jsonwebtoken");
 const path = require("path");
 const fs  = require("fs");
 
-const { verifyJWTToken } = require('../tokenTools');
+const { verifyJWTToken, destroyJWTToken } = require('../../token/tokenTools');
 
 const db = require("../../models/init.js");
 const User = db.sequelize.models.user;
@@ -15,8 +14,7 @@ async function confirmEmail(req, res) {
     const confirmToken = req.params.confirm_token;
 
     try {
-        const decoded = await verifyJWTToken(confirmToken, tokenOptions.secret);
-        // const decoded = jwt.verify(confirmToken, tokenOptions.secret);
+        const decoded = await verifyJWTToken(confirmToken, tokenOptions.secret_email);
         if (!decoded.email) {
             throw new Error('');
         }
@@ -34,6 +32,8 @@ async function confirmEmail(req, res) {
             status: "active"
         });
         user = await user.save();
+
+        await destroyJWTToken(confirmToken);
         
         res.status(201).send();
     } catch (err) {

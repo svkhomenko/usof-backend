@@ -1,4 +1,6 @@
 {
     "expire_sec": 7200,
-    "secret": "secret"
+    "secret": "secret",
+    "secret_email": "secret_email",
+    "secret_password": "secret_password"
 }

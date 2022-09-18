@@ -12,10 +12,16 @@ async function signJWTToken(...data) {
 }
 
 async function verifyJWTToken(verToken, secret) {
-    const data = await jwt.verify(verToken, secret);
+    let data;
+    try {
+        data = jwt.verify(verToken, secret);
+    } catch (err) {
+        throw new ValidationError("Invalid token", 401);
+    }
+    
     const token = await Token.findOne({
         where: {
-            token: token
+            token: verToken
         }
     });
     if (!token) {

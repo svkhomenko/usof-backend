@@ -9,13 +9,13 @@ module.exports = function initToken(sequelize) {
             unique: true
         },
         createdAt: {
-            // type: DataTypes.DATE,
-            // defaultValue: Sequelize.NOW,
-            // allowNull: false
-
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            type: DataTypes.DATE,
+            defaultValue: Sequelize.NOW,
             allowNull: false
+
+            // type: 'TIMESTAMP',
+            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            // allowNull: false
         }
     },
     { 
