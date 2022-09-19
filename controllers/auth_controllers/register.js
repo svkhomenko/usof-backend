@@ -138,12 +138,27 @@ async function register(req, res) {
             email: data.email
         });
 
+
+
+        let link = data.link;
+        if (link[link.length - 1] !== '/') {
+            link += '/';
+        }
+        link += await generateToken({ email: data.email }, "secret_email");
+
         const subject = 'Confirm your email in Usof';
         const text = `Hi ${data.login}! Click the link to comfirm your email in Usof. The link will be active for 2 hours`;
-        const html = `Hi ${data.login}!<br>Click <a href="${data.link}">the link</a> to comfirm your email in Usof. The link will be active for 2 hours`;
+        const html = `Hi ${data.login}!<br>Click <a href="${link}">the link</a> to comfirm your email in Usof. The link will be active for 2 hours`;
         sendEmail(data.email, subject, text, html);
 
-        res.status(201).json({ confirmTokenForEmail: await generateToken({ email: data.email }, "secret_email") });
+        res.status(201).send();
+
+        // const subject = 'Confirm your email in Usof';
+        // const text = `Hi ${data.login}! Click the link to comfirm your email in Usof. The link will be active for 2 hours`;
+        // const html = `Hi ${data.login}!<br>Click <a href="${data.link}">the link</a> to comfirm your email in Usof. The link will be active for 2 hours`;
+        // sendEmail(data.email, subject, text, html);
+
+        // res.status(201).json({ confirmTokenForEmail: await generateToken({ email: data.email }, "secret_email") });
     }
     catch(err) {
         if (err instanceof ValidationError) {

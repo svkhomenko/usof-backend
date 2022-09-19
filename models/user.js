@@ -67,10 +67,6 @@ module.exports = function initUser(sequelize) {
         picturePath: {
             type: DataTypes.STRING
         },
-        // rating: {
-        //     type: DataTypes.VIRTUAL,
-        //     // get: getRating
-        // },
         role: {
             type: DataTypes.ENUM('admin', 'user'),
             allowNull: false,
@@ -85,9 +81,18 @@ module.exports = function initUser(sequelize) {
     {
         timestamps: false,
         hooks: {
-            beforeDestroy: async function (instance, options) {
+            beforeUpdate: async function (instance) {
+                let prevPath = instance._previousDataValues.picturePath;
+                if (instance._changed.has('picturePath') && prevPath) {
+                    const pictureFilePath = path.resolve("uploads", prevPath);
+                    if (fs.existsSync(pictureFilePath)) {
+                        await fs.promises.unlink(pictureFilePath);
+                    }
+                }
+            },
+            beforeDestroy: async function (instance) {
                 if (instance.picturePath) {
-                    const pictureFilePath = path.resolve("uploads", "instance.picturePath");
+                    const pictureFilePath = path.resolve("uploads", instance.picturePath);
                     if (fs.existsSync(pictureFilePath)) {
                         await fs.promises.unlink(pictureFilePath);
                     }
