@@ -1,6 +1,7 @@
 const db = require("../init.js");
 const userOptions = require('./userOptions');
 const postOptions = require('./postOptions');
+const favoritesPostOptions = require('./favoritesPostOptions');
 const imageFromPostOptions = require('./imageFromPostOptions');
 const categoryPostOptions = require('./categoryPostOptions');
 const commentOptions = require('./commentOptions');
@@ -10,6 +11,7 @@ const likeForCommentOptions = require('./likeForCommentOptions');
 
 const User = db.sequelize.models.user; 
 const Post = db.sequelize.models.post; 
+const FavoritesPost = db.sequelize.models.favoritesPost;
 const ImageFromPost = db.sequelize.models.imageFromPost;
 const Category = db.sequelize.models.category; 
 const CategoryPost = db.sequelize.models.categoryPost; 
@@ -27,6 +29,10 @@ module.exports = [
     {
         resource: Post,
         options: postOptions.options
+    },
+    {
+        resource: FavoritesPost,
+        options: favoritesPostOptions.options
     },
     {
         resource: ImageFromPost,

@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 module.exports = function initImageFromComment(sequelize) {
-    const ImageFormComment = sequelize.define("imageFromComment", {
+    const ImageFromComment = sequelize.define("imageFromComment", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

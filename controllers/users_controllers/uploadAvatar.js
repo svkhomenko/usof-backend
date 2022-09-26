@@ -20,11 +20,19 @@ async function uploadAvatar(req, res) {
             throw new ValidationError("Invalid token", 401);
         }
 
-        curUser.set({
-            picturePath: req.file.filename
-        });
-        curUser = await curUser.save();
-        
+        if (req.file && req.file.filename) {
+            curUser.set({
+                picturePath: req.file.filename
+            });
+            curUser = await curUser.save();
+        }
+        else if (req.body.deleteAvatar) {
+            curUser.set({
+                picturePath: null
+            });
+            curUser = await curUser.save();
+        }
+
         res.status(200)
             .json({
                 id: curUser.id,

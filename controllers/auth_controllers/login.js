@@ -1,7 +1,7 @@
 const bcrypt  = require("bcrypt");
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
-const { generateToken } = require('../tools/sendEmail');
+const { sendEmail, generateToken } = require('../tools/sendEmail');
 
 const User = db.sequelize.models.user;
 
@@ -23,6 +23,19 @@ async function login(req, res) {
         }
 
         if (user.status !== 'active') {
+            if (req.body.link) {
+                let link = req.body.link;
+                if (link[link.length - 1] !== '/') {
+                    link += '/';
+                }
+                link += await generateToken({ email: user.email }, "secret_email");
+
+                const subject = 'Confirm your email in Usof';
+                const text = `Hi ${user.login}! Click the link to comfirm your email in Usof. The link will be active for 2 hours`;
+                const html = `Hi ${user.login}!<br>Click <a href="${link}">the link</a> to comfirm your email in Usof. The link will be active for 2 hours`;
+                sendEmail(user.email, subject, text, html);
+            }
+
             throw new ValidationError("Your email is not confirmed. Check your email", 403);
         }
         

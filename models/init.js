@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 
 const initUser = require("./user");
 const initPost = require("./post");
+const initFavoritesPost = require("./favoritesPost");
 const initImageFromPost = require("./imageFromPost");
 const initCategory = require("./category");
 const initCategoryPost = require("./categoryPost");
@@ -36,6 +37,7 @@ const sequelize = new Sequelize(
 
 initUser(sequelize);
 initPost(sequelize);
+initFavoritesPost(sequelize);
 initImageFromPost(sequelize);
 initCategory(sequelize);
 initCategoryPost(sequelize);
@@ -47,6 +49,7 @@ initToken(sequelize);
 
 const User = sequelize.models.user;
 const Post = sequelize.models.post;
+const FavoritesPost = sequelize.models.favoritesPost;
 const ImageFromPost = sequelize.models.imageFromPost;
 const Category = sequelize.models.category;
 const CategoryPost = sequelize.models.categoryPost;
@@ -66,6 +69,17 @@ const UserPostSettings = {
 };
 User.hasMany(Post, { as: 'ownPosts', ...UserPostSettings});
 Post.belongsTo(User, {  as: 'postAuthor', ...UserPostSettings});
+
+User.belongsToMany(Post, { 
+    as: 'ownFavoritesPost',
+    through: FavoritesPost,
+    hooks: true
+});
+Post.belongsToMany(User, { 
+    as: 'addToFavoritesUser', 
+    through: FavoritesPost,
+    hooks: true
+});
 
 const PostImageSettings = {
     foreignKey: {

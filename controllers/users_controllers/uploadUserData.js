@@ -69,6 +69,12 @@ async function uploadUserData(req, res) {
         }
 
         if (data.email) {
+            curUser.set({
+                email: data.email
+            });
+
+            curUser = await curUser.save();
+
             let link = data.link;
             if (link[link.length - 1] !== '/') {
                 link += '/';
@@ -79,11 +85,6 @@ async function uploadUserData(req, res) {
             const text = `Hi ${data.login}! Click the link to comfirm your email in Usof. The link will be active for 2 hours`;
             const html = `Hi ${data.login}!<br>Click <a href="${link}">the link</a> to comfirm your email in Usof. The link will be active for 2 hours`;
             sendEmail(data.email, subject, text, html);
-
-            curUser.set({
-                email: data.email,
-                status: "pending"
-            });
         }
 
         if (data.login) {
@@ -98,9 +99,14 @@ async function uploadUserData(req, res) {
             });
         }
 
-        if (req.file) {
+        if (req.file && req.file.filename) {
             curUser.set({
                 picturePath: req.file.filename
+            });
+        }
+        else if (data.deleteAvatar) {
+            curUser.set({
+                picturePath: null
             });
         }
 

@@ -15,9 +15,11 @@ require('./token/deleteTokens')();
 
 const authRouter = require("./routes/auth_router.js");
 const usersRouter = require("./routes/users_router.js");
+const postsRouter = require("./routes/posts_router.js");
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/posts", postsRouter);
  
 app.use(function (req, res) {
     res.status(404)

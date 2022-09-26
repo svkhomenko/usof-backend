@@ -7,8 +7,7 @@ const bcrypt  = require("bcrypt");
 const UploadProvider = require('./UploadProvider');
 
 exports.options = {
-    listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'role', 'status'],
-    // listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role', 'status'],
+    listProperties: ['id', 'login', 'fullName', 'email', 'profilePicture', 'rating', 'role', 'status'],
     properties: {
         email: {
             isTitle: false
@@ -23,7 +22,11 @@ exports.options = {
             isVisible: { list: false, filter: false, show: false, edit: false }
         },
         rating: {
-            isVisible: { list: true, filter: true, show: true, edit: false }
+            isVisible: { list: true, filter: false, show: true, edit: false },
+            components: {
+                show: AdminJS.bundle('../../components/rating_show.js'),
+                list: AdminJS.bundle('../../components/rating_list.js')
+            }
         },
         status: {
             isVisible: { list: true, filter: true, show: true, edit: false }
@@ -58,7 +61,6 @@ exports.features = [
             mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
         },
         uploadPath: (record, filename) => {
-            // console.log('uploadPath', record, filename);
             return `${record.id()}${Date.now()}-${filename}`;
         }
     }),

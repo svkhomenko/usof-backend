@@ -21,6 +21,7 @@ function avatarUpload(req, res, next) {
 
 usersRouter.get("/", isAuth, usersController.getAllUsers);
 usersRouter.get("/:user_id", isAuth, usersController.getUserById);
+usersRouter.get("/:user_id/rating", usersController.getRatingById);
 usersRouter.post("/", isAdmin, usersController.createNewUser);
 usersRouter.patch("/avatar", isAuth, avatarUpload, usersController.uploadAvatar);
 usersRouter.patch("/:user_id", canUpdateUserData, avatarUpload, usersController.uploadUserData);

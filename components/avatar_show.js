@@ -1,23 +1,20 @@
 import React from 'react';
 import { Buffer } from "buffer";
-import { ValueGroup, Label } from '@adminjs/design-system';
+import { ValueGroup } from '@adminjs/design-system';
 
 const Avatar = (props) => {
-    // console.log("props", props);
     let src = "/avatar.png";
     if (props.record.params.profilePicture) {
-        // src = 'data:imagSe/png;base64,' + props.record.params.profilePicture;
         src = 'data:image/png;base64,' + Buffer.from(props.record.params.profilePicture, "binary").toString("base64");
     }
     else if (props.record.params.image) {
-        // src = 'data:image/png;base64,' + props.record.params.image;
         src = 'data:image/png;base64,' + Buffer.from(props.record.params.image, "binary").toString("base64");
     }
 
     return (
-        React.createElement(ValueGroup, null,
-            React.createElement(Label, null, "Profile Picture"),
-            React.createElement("div", {
+        React.createElement(ValueGroup, {
+            "label": "Profile Picture",
+            "value": React.createElement("div", {
                 style: {
                     display: "flex",
                     justifyContent: "center",
@@ -35,8 +32,10 @@ const Avatar = (props) => {
                     }
                 })
             )
-        )
+        }, null
+    )
     );
 }
 
 export default Avatar;
+

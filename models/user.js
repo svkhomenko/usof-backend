@@ -82,6 +82,10 @@ module.exports = function initUser(sequelize) {
         timestamps: false,
         hooks: {
             beforeUpdate: async function (instance) {
+                if (instance.email !== instance._previousDataValues.email) {
+                    instance.status = "pending";
+                }
+                
                 let prevPath = instance._previousDataValues.picturePath;
                 if (instance._changed.has('picturePath') && prevPath) {
                     const pictureFilePath = path.resolve("uploads", prevPath);

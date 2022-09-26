@@ -44,7 +44,6 @@ exports.features = [
             mimeTypes: ['image/bmp', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/tiff', 'image/webp']
         },
         uploadPath: (record, filename) => {
-            // console.log('uploadPath', record, filename);
             return `${record.id()}${Date.now()}-posts-${filename}`;
         }
     })

@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 module.exports = function initImageFromPost(sequelize) {
-    const ImageFormPost = sequelize.define("imageFromPost", {
+    const ImageFromPost = sequelize.define("imageFromPost", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,

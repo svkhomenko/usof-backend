@@ -138,8 +138,6 @@ async function register(req, res) {
             email: data.email
         });
 
-
-
         let link = data.link;
         if (link[link.length - 1] !== '/') {
             link += '/';
