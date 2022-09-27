@@ -29,7 +29,6 @@ async function getPostCategoriesById(req, res) {
         }
         
         const post = await Post.findByPk(postId);
-
         if (!post) {
             throw new ValidationError("No post with this id", 404);
         }

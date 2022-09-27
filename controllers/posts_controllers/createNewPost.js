@@ -32,10 +32,12 @@ async function createNewPost(req, res) {
             throw new ValidationError("Title is required", 400);
         }
 
-        for (let i = 0; i < categories.length; i++) {
-            const category = await Category.findByPk(categories[i]);
-            if (!category) {
-                throw new ValidationError("No category with this id", 401);
+        if (categories) {
+            for (let i = 0; i < categories.length; i++) {
+                const category = await Category.findByPk(categories[i]);
+                if (!category) {
+                    throw new ValidationError("No category with this id", 401);
+                }
             }
         }
         
@@ -45,22 +47,22 @@ async function createNewPost(req, res) {
             author: curUser.id
         });
 
-        req.files.forEach(async (file) => {
+        await Promise.all(req.files.map(async (file) => {
             if (file && file.filename) {
                 await ImageFromPost.create({
                     picturePath: file.filename,
                     postId: post.id
                 });
             }
-        });
+        }));
 
         if (categories) {
-            categories.forEach(async (categoryId) => {
+            await Promise.all(categories.map(async (categoryId) => {
                 await CategoryPost.create({
                     categoryId: categoryId,
                     postId: post.id
                 });
-            });
+            }));
         }
 
         res.status(201).send();

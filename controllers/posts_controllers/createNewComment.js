@@ -56,14 +56,14 @@ async function createNewComment(req, res) {
             repliedCommentId
         });
 
-        req.files.forEach(async (file) => {
+        await Promise.all(req.files.map(async (file) => {
             if (file && file.filename) {
                 await ImageFromComment.create({
                     picturePath: file.filename,
                     commentId: comment.id
                 });
             }
-        });
+        }));
         
         res.status(201).send();
     }

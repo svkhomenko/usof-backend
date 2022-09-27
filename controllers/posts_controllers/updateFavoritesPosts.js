@@ -1,20 +1,20 @@
 const path = require("path");
 const fs  = require("fs");
-
-const db = require("../models/init.js");
+const db = require("../../models/init.js");
+const ValidationError = require('../../errors/ValidationError');
+const { verifyJWTToken } = require('../../token/tokenTools');
 const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
-const { verifyJWTToken } = require('../token/tokenTools');
-const ValidationError = require('../errors/ValidationError');
+const FavoritesPost = db.sequelize.models.favoritesPost;
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
 
-async function canUpdatePostData(req, res, next) {
+async function updateFavoritesPosts(req, res) {
     const token = req.headers.authorization;
     const postId = req.params.post_id;
-
+    
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
 
@@ -27,13 +27,38 @@ async function canUpdatePostData(req, res, next) {
         if (!curPost) {
             throw new ValidationError("No post with this id", 404);
         }
-
-        if (curUser.role !== 'admin' && curPost.author != curUser.id) {
+        
+        if (curPost.status === "inactive") {
             throw new ValidationError("Forbidden data", 403); 
         }
-        
-        next();
-    } catch (err) {
+
+        const fav = await FavoritesPost.findOne({
+            where: {
+                userId: curUser.id,
+                postId: curPost.id
+            }
+        });
+
+        if (fav) {
+            await FavoritesPost.destroy({
+                where: {
+                    userId: curUser.id,
+                    postId: curPost.id
+                }
+            });
+
+            res.status(204).send();
+        }
+        else {
+            await FavoritesPost.create({
+                userId: curUser.id,
+                postId: curPost.id
+            });        
+            
+            res.status(201).send();
+        }
+    }
+    catch(err) {
         if (err instanceof ValidationError) {
             res.status(err.status)
                 .json({ message: err.message });
@@ -48,8 +73,8 @@ async function canUpdatePostData(req, res, next) {
             res.status(400)
                 .json({ message: err });
         } 
-    }
+    }    
 }
 
-module.exports = canUpdatePostData;
+module.exports = updateFavoritesPosts;
 
