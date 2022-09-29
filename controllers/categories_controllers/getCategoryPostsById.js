@@ -15,8 +15,9 @@ const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
 
-async function getFavoritesPosts(req, res) {
+async function getCategoryPostsById(req, res) {
     const token = req.headers.authorization;
+    const categoryId = req.params.category_id;
 
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
@@ -24,6 +25,11 @@ async function getFavoritesPosts(req, res) {
         const curUser = await User.findByPk(decoded.id);
         if (!curUser) {
             throw new ValidationError("Invalid token", 401);
+        }
+
+        const curCategory = await Category.findByPk(categoryId);
+        if (!curCategory) {
+            throw new ValidationError("No category with this id", 401);
         }
 
         let limit = 10;
@@ -79,18 +85,6 @@ async function getFavoritesPosts(req, res) {
                     }
                 ] 
             };
-        }
-
-        let filterCategoriesWhere = {};
-        let filterCategoriesRequired = false;
-        if (req.query.filterCategory) {
-            let filterCategories = req.query.filterCategory.split(',');
-            filterCategoriesWhere = {
-                title: {
-                    [Op.in]: filterCategories 
-                }
-            };
-            filterCategoriesRequired = true;
         }
 
         if (req.query.filterDate) {
@@ -156,13 +150,15 @@ async function getFavoritesPosts(req, res) {
                     model: User,
                     as: "addToFavoritesUser",
                     where: {
-                        id: curUser.id
-                    }
+                        id: (curUser ? curUser.id : 0)
+                    },
+                    required: false
                 },
                 {
                     model: Category,
-                    where: filterCategoriesWhere,
-                    required: filterCategoriesRequired
+                    where: {
+                        id: categoryId
+                    }
                 }
             ],
             group: ['Post.id'],
@@ -174,7 +170,7 @@ async function getFavoritesPosts(req, res) {
 
         allPosts = await Promise.all(allPosts.map(async (post) => {
             let [ownlike] = await post.getLikeForPosts({ where: { author: curUser.id } });
-
+            
             return ({
                 id: post.id,
                 title: post.title,
@@ -236,5 +232,5 @@ async function getFavoritesPosts(req, res) {
     }    
 }
 
-module.exports = getFavoritesPosts;
+module.exports = getCategoryPostsById;
 

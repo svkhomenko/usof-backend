@@ -1,7 +1,6 @@
 const express = require("express");
 const postsController = require('../controllers/posts_controllers/posts_controller');
 const isAuth = require("../middleware/isAuth");
-// const isAdmin = require("../middleware/isAdmin");
 const canUpdatePostData = require("../middleware/canUpdatePostData");
 const postsRouter = express.Router();
 

@@ -1,6 +1,5 @@
 const path = require("path");
 const fs  = require("fs");
-
 const db = require("../models/init.js");
 const User = db.sequelize.models.user;
 const { verifyJWTToken } = require('../token/tokenTools');
@@ -38,7 +37,7 @@ async function canUpdateUserData(req, res, next) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }

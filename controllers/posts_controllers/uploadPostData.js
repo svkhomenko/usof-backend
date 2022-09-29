@@ -36,6 +36,10 @@ async function uploadPostData(req, res) {
         }
 
         if (categories) {
+            if (!Array.isArray(categories)) {
+                throw new ValidationError("Categories must be array", 400);
+            }
+
             for (let i = 0; i < categories.length; i++) {
                 const category = await Category.findByPk(categories[i]);
                 if (!category) {
@@ -56,6 +60,10 @@ async function uploadPostData(req, res) {
 
         if (post.author == curUser.id) {
             if (deleteFiles) {
+                if (!Array.isArray(deleteFiles)) {
+                    throw new ValidationError("deleteFiles must be array", 400);
+                }
+
                 deleteFiles.forEach(async (fileId) => {
                     await ImageFromPost.destroy({
                         where: {
@@ -146,6 +154,8 @@ async function uploadPostData(req, res) {
         if (!post) {
             throw new ValidationError("No post with this id", 404);
         }
+
+        let [ownlike] = await post.getLikeForPosts({ where: { author: curUser.id } });
         
         res.status(200)
             .json({
@@ -171,6 +181,7 @@ async function uploadPostData(req, res) {
                     });
                 }),
                 addToFavoritesUser: !!post.addToFavoritesUser.length,
+                isLiked: (ownlike ? { type: ownlike.type } : false),
                 categories: post.categories.map(category => {
                     return ({
                         id: category.id,
@@ -194,7 +205,7 @@ async function uploadPostData(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

@@ -1,13 +1,13 @@
 const db = require("../../models/init.js");
-const User = db.sequelize.models.user;
+const Category = db.sequelize.models.category;
 
-async function deleteUser(req, res) {
-    const id = req.params.user_id;
+async function deleteCategory(req, res) {
+    const categoryId = req.params.category_id;
 
     try {
-        await User.destroy({
+        await Category.destroy({
             where: {
-                id: id
+                id: categoryId
             }
         });
         
@@ -27,5 +27,5 @@ async function deleteUser(req, res) {
     }    
 }
 
-module.exports = deleteUser;
+module.exports = deleteCategory;
 

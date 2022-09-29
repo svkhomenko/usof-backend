@@ -84,10 +84,14 @@ async function getPostCommentsById(req, res) {
         });
 
         allComments = await Promise.all(allComments.map(async (comment) => {
+            let [ownlike] = await comment.getLikeForComments({ where: { author: (curUser ? curUser.id : 0) } });
+
             let repliedComment = null;
             if (comment.repliedComment) {
                 repliedComment = 'Comment is inactive'
-                if ((curUser && curUser.role === 'admin') || comment.repliedComment.status === 'active') {
+                if ((curUser && (curUser.role === 'admin' || comment.repliedComment.author == curUser.id)) 
+                    || comment.repliedComment.status === 'active') {
+                        
                     repliedComment = {
                         id: comment.repliedComment.id,
                         publishDate: comment.repliedComment.publishDate,
@@ -130,7 +134,8 @@ async function getPostCommentsById(req, res) {
                 }),
                 likesCount: await comment.countLikeForComments( { where: { type: "like" } }),
                 dislikesCount: await comment.countLikeForComments( { where: { type: "dislike" } }),
-                repliedComment: repliedComment
+                repliedComment: repliedComment,
+                isLiked: (ownlike ? { type: ownlike.type } : false)
             });
         }));
         
@@ -153,7 +158,7 @@ async function getPostCommentsById(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

@@ -1,17 +1,24 @@
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
-const User = db.sequelize.models.user;
+const Category = db.sequelize.models.category;
 
-async function getRatingById(req, res) {
-    const id = req.params.user_id;
-
+async function createNewCategory(req, res) {
+    const { title, description } = req.body;
+    
     try {
-        const user = await User.findByPk(id);
-        if (!user) {
-            throw new ValidationError("No user with this id", 404);
+        if (!title) {
+            throw new ValidationError("Title is required", 400);
         }
+        if (!description) {
+            throw new ValidationError("Description is required", 400);
+        }
+
+        await Category.create({
+            title,
+            description
+        });
         
-        res.status(200).json({ rating: await user.getRating() });
+        res.status(201).send();
     }
     catch(err) {
         if (err instanceof ValidationError) {
@@ -31,5 +38,5 @@ async function getRatingById(req, res) {
     }    
 }
 
-module.exports = getRatingById;
+module.exports = createNewCategory;
 

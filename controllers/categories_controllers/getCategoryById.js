@@ -1,17 +1,21 @@
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
-const User = db.sequelize.models.user;
+const Category = db.sequelize.models.category;
 
-async function getRatingById(req, res) {
-    const id = req.params.user_id;
+async function getCategoryById(req, res) {
+    const categoryId = req.params.category_id;
 
     try {
-        const user = await User.findByPk(id);
-        if (!user) {
-            throw new ValidationError("No user with this id", 404);
+        const category = await Category.findByPk(categoryId);
+
+        if (!category) {
+            throw new ValidationError("No category with this id", 404);
         }
         
-        res.status(200).json({ rating: await user.getRating() });
+        res.status(200)
+            .json({
+                category
+            });
     }
     catch(err) {
         if (err instanceof ValidationError) {
@@ -31,5 +35,5 @@ async function getRatingById(req, res) {
     }    
 }
 
-module.exports = getRatingById;
+module.exports = getCategoryById;
 

@@ -179,6 +179,8 @@ async function getAllPosts(req, res) {
         });
 
         allPosts = await Promise.all(allPosts.map(async (post) => {
+            let [ownlike] = await post.getLikeForPosts({ where: { author: (curUser ? curUser.id : 0) } });
+            
             return ({
                 id: post.id,
                 title: post.title,
@@ -202,6 +204,7 @@ async function getAllPosts(req, res) {
                     });
                 }),
                 addToFavoritesUser: !!post.addToFavoritesUser.length,
+                isLiked: (ownlike ? { type: ownlike.type } : false),
                 categories: post.categories.map(category => {
                     return ({
                         id: category.id,
@@ -233,7 +236,7 @@ async function getAllPosts(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

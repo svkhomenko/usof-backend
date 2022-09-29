@@ -2,7 +2,7 @@ const path = require("path");
 const fs  = require("fs");
 const db = require("../models/init.js");
 const User = db.sequelize.models.user;
-const Post = db.sequelize.models.post;
+const Comment = db.sequelize.models.comment;
 const { verifyJWTToken } = require('../token/tokenTools');
 const ValidationError = require('../errors/ValidationError');
 
@@ -10,9 +10,9 @@ const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
 
-async function canUpdatePostData(req, res, next) {
+async function canUpdateCommentData(req, res, next) {
     const token = req.headers.authorization;
-    const postId = req.params.post_id;
+    const commentId = req.params.comment_id;
 
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
@@ -22,12 +22,12 @@ async function canUpdatePostData(req, res, next) {
             throw new ValidationError("Invalid token", 401);
         }
 
-        const curPost = await Post.findByPk(postId);
-        if (!curPost) {
-            throw new ValidationError("No post with this id", 404);
+        const curComment = await Comment.findByPk(commentId);
+        if (!curComment) {
+            throw new ValidationError("No comment with this id", 404);
         }
 
-        if (curUser.role !== 'admin' && curPost.author != curUser.id) {
+        if (curUser.role !== 'admin' && curComment.author != curUser.id) {
             throw new ValidationError("Forbidden data", 403); 
         }
         
@@ -50,5 +50,5 @@ async function canUpdatePostData(req, res, next) {
     }
 }
 
-module.exports = canUpdatePostData;
+module.exports = canUpdateCommentData;
 

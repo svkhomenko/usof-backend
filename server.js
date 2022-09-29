@@ -16,10 +16,14 @@ require('./token/deleteTokens')();
 const authRouter = require("./routes/auth_router.js");
 const usersRouter = require("./routes/users_router.js");
 const postsRouter = require("./routes/posts_router.js");
+const categoriesRouter = require("./routes/categories_router.js");
+const commentsRouter = require("./routes/comments_router.js");
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
+app.use("/api/categories", categoriesRouter);
+app.use("/api/comments", commentsRouter);
  
 app.use(function (req, res) {
     res.status(404)

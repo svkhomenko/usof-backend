@@ -5,15 +5,16 @@ const ValidationError = require('../../errors/ValidationError');
 const { verifyJWTToken } = require('../../token/tokenTools');
 const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
-const LikeForPost = db.sequelize.models.likeForPost;
+const Comment = db.sequelize.models.comment;
+const LikeForComment = db.sequelize.models.likeForComment;
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
 
-async function getPostLikeById(req, res) {
+async function getCommentLikeById(req, res) {
     const token = req.headers.authorization;
-    const postId = req.params.post_id;
+    const commentId = req.params.comment_id;
     
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
@@ -23,12 +24,17 @@ async function getPostLikeById(req, res) {
             throw new ValidationError("Invalid token", 401);
         }
 
-        const curPost = await Post.findByPk(postId);
+        const curComment = await Comment.findByPk(commentId);
+        if (!curComment) {
+            throw new ValidationError("No comment with this id", 404);
+        }
+
+        const curPost = await Post.findByPk(curComment.postId);
         if (!curPost) {
             throw new ValidationError("No post with this id", 404);
         }
-
-        if (curUser.role !== 'admin' && curPost.status === "inactive") {
+        if (curUser.role !== 'admin' && curComment.author != curUser.id
+            && (curPost.status === "inactive" || curComment.status === "inactive")) {
             throw new ValidationError("Forbidden data", 403); 
         }
 
@@ -41,9 +47,9 @@ async function getPostLikeById(req, res) {
             offset = (req.query.page - 1) * limit;
         }
 
-        let {count: countLikes, rows: likes} = await LikeForPost.findAndCountAll({
+        let {count: countLikes, rows: likes} = await LikeForComment.findAndCountAll({
             where: {
-                postId: postId,
+                commentId: commentId,
                 type: 'like'
             },
             include: [
@@ -55,9 +61,9 @@ async function getPostLikeById(req, res) {
             limit: limit
         });
 
-        let {count: countDislikes, rows: dislikes} = await LikeForPost.findAndCountAll({
+        let {count: countDislikes, rows: dislikes} = await LikeForComment.findAndCountAll({
             where: {
-                postId: postId,
+                commentId: commentId,
                 type: 'dislike'
             },
             include: [
@@ -81,7 +87,7 @@ async function getPostLikeById(req, res) {
                     rating: await like.user.getRating(),
                     status: like.user.status
                 },
-                postId: like.postId,
+                commentId: like.commentId,
                 publishDate: like.publishDate,
                 type: like.type
             });
@@ -99,7 +105,7 @@ async function getPostLikeById(req, res) {
                     rating: await dislike.user.getRating(),
                     status: dislike.user.status
                 },
-                postId: dislike.postId,
+                commentId: dislike.commentId,
                 publishDate: dislike.publishDate,
                 type: dislike.type
             });
@@ -132,5 +138,5 @@ async function getPostLikeById(req, res) {
     }    
 }
 
-module.exports = getPostLikeById;
+module.exports = getCommentLikeById;
 

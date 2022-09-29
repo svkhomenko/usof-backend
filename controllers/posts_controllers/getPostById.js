@@ -62,6 +62,8 @@ async function getPostById(req, res) {
         if ((!curUser || curUser.role !== 'admin') && post.status === "inactive") {
             throw new ValidationError("Forbidden data", 403); 
         }
+
+        let [ownlike] = await post.getLikeForPosts({ where: { author: (curUser ? curUser.id : 0) } });
         
         res.status(200)
             .json({
@@ -87,6 +89,7 @@ async function getPostById(req, res) {
                     });
                 }),
                 addToFavoritesUser: !!post.addToFavoritesUser.length,
+                isLiked: (ownlike ? { type: ownlike.type } : false),
                 categories: post.categories.map(category => {
                     return ({
                         id: category.id,
@@ -110,7 +113,7 @@ async function getPostById(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

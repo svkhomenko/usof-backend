@@ -53,7 +53,7 @@ async function deleteLikeUnderPost(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

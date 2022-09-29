@@ -33,6 +33,10 @@ async function createNewPost(req, res) {
         }
 
         if (categories) {
+            if (!Array.isArray(categories)) {
+                throw new ValidationError("Categories must be array", 400);
+            }
+
             for (let i = 0; i < categories.length; i++) {
                 const category = await Category.findByPk(categories[i]);
                 if (!category) {
@@ -79,7 +83,7 @@ async function createNewPost(req, res) {
         else {
             console.log('err', err);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }    

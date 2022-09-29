@@ -6,16 +6,16 @@ const { verifyJWTToken } = require('../../token/tokenTools');
 const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
 const Comment = db.sequelize.models.comment;
-const ImageFromComment = db.sequelize.models.imageFromComment;
+const LikeForComment = db.sequelize.models.likeForComment;
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
 const tokenOptions = JSON.parse(tokenOptFile);
 
-async function createNewComment(req, res) {
+async function createNewLikeUnderComment(req, res) {
     const token = req.headers.authorization;
-    const { content, repliedCommentId } = req.body;
-    const postId = req.params.post_id;
+    const { type } = req.body;
+    const commentId = req.params.comment_id;
     
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
@@ -24,46 +24,40 @@ async function createNewComment(req, res) {
         if (!curUser) {
             throw new ValidationError("Invalid token", 401);
         }
+        
+        const curComment = await Comment.findByPk(commentId);
+        if (!curComment) {
+            throw new ValidationError("No comment with this id", 404);
+        }
 
-        const curPost = await Post.findByPk(postId);
+        const curPost = await Post.findByPk(curComment.postId);
         if (!curPost) {
             throw new ValidationError("No post with this id", 404);
         }
-        
-        if (curPost.status === "inactive") {
+        if (curUser.role !== 'admin' && curComment.author != curUser.id
+            && (curPost.status === "inactive" || curComment.status === "inactive")) {
             throw new ValidationError("Forbidden data", 403); 
         }
 
-        if (!content) {
-            throw new ValidationError("Content is required", 400);
+        if (!type) {
+            throw new ValidationError("Type is required", 400);
         }
-
-        if (repliedCommentId) {
-            const repliedComment = await Comment.findByPk(repliedCommentId);
-            if (!repliedComment) {
-                throw new ValidationError("No comment with this id", 404);
-            }
-            
-            if (repliedComment.status === "inactive") {
-                throw new ValidationError("Forbidden data", 403); 
-            }
+        if (type !== 'like' && type !== 'dislike') {
+            throw new ValidationError("Type must be 'like' or 'dislike'", 400);
         }
-
-        const comment = await Comment.create({
-            content,
-            author: curUser.id,
-            postId: curPost.id,
-            repliedCommentId
+        
+        await LikeForComment.destroy({
+            where: {
+                author: curUser.id,
+                commentId: curComment.id
+            }
         });
-
-        await Promise.all(req.files.map(async (file) => {
-            if (file && file.filename) {
-                await ImageFromComment.create({
-                    picturePath: file.filename,
-                    commentId: comment.id
-                });
-            }
-        }));
+        
+        await LikeForComment.create({
+            author: curUser.id,
+            commentId: curComment.id,
+            type
+        });        
         
         res.status(201).send();
     }
@@ -85,5 +79,5 @@ async function createNewComment(req, res) {
     }    
 }
 
-module.exports = createNewComment;
+module.exports = createNewLikeUnderComment;
 
