@@ -25,7 +25,6 @@ async function sendPasswordConfirmation(req, res) {
             throw new ValidationError("No user with this email found", 404);
         }
 
-
         let link = data.link;
         if (link[link.length - 1] !== '/') {
             link += '/';

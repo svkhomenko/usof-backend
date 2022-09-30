@@ -165,7 +165,7 @@ async function getFavoritesPosts(req, res) {
                     required: filterCategoriesRequired
                 }
             ],
-            group: ['Post.id'],
+            group: ['post.id'],
             order: orderBy,
             offset: offset,
             limit: limit,

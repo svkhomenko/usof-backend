@@ -161,7 +161,7 @@ async function getCategoryPostsById(req, res) {
                     }
                 }
             ],
-            group: ['Post.id'],
+            group: ['post.id'],
             order: orderBy,
             offset: offset,
             limit: limit,
