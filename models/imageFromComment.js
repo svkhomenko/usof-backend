@@ -21,7 +21,6 @@ module.exports = function initImageFromComment(sequelize) {
                         file = fs.readFileSync(filePath);
                     }
                     catch(error) {
-                        console.log('setter picturePath imageFromPost', error);
                         return null;
                     }
         

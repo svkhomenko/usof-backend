@@ -13,12 +13,13 @@ async function createNewCategory(req, res) {
             throw new ValidationError("Description is required", 400);
         }
 
-        await Category.create({
+        const category = await Category.create({
             title,
             description
         });
         
-        res.status(201).send();
+        res.setHeader("Location", `/api/categories/${category.id}`)
+            .status(201).send();
     }
     catch(err) {
         if (err instanceof ValidationError) {

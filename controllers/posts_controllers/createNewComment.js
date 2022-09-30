@@ -65,7 +65,8 @@ async function createNewComment(req, res) {
             }
         }));
         
-        res.status(201).send();
+        res.setHeader("Location", `/api/comments/${comment.id}`)
+            .status(201).send();
     }
     catch(err) {
         if (err instanceof ValidationError) {

@@ -12,10 +12,6 @@ module.exports = function initToken(sequelize) {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
             allowNull: false
-
-            // type: 'TIMESTAMP',
-            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-            // allowNull: false
         }
     },
     { 

@@ -22,42 +22,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// function sendEmail(email, login, password) {
-//     transporter.sendMail({
-//         from: '"Usof" <ucodeskhomenko@gmail.com>',
-//         to: email,
-//         subject: 'Confirm your password in Usof',
-//         text: `Hi ${login}! Click the link to comfirm your password in Usof. The link will be active for 2 hours`,
-//         html: `Hi ${login}!<br>Click <a href="http://localhost:3000/api/auth/password-reset/${generateAccessToken(email)}">the link</a> to comfirm your password in Usof. The link will be active for 2 hours`
-//         // html: `Hi ${login}!<br>Click 
-//         //         <from action="http://localhost:3000/api/auth/password-reset/${generateAccessToken(email)}" 
-//         //                 method="POST">
-//         //             <input type="hidden" id="email" value="${email}">
-//         //             <input type="hidden" id="newPassword" value="${password}">
-//         //             <button type="submit">
-//         //                 the link
-//         //             </button>
-//         //         </form>
-//         //         to comfirm your password in Usof. The link will be active for 2 hours`
-//         // html: `Hi ${login}!<br>Click 
-//         //         <from action="http://localhost:3000/api/auth/password-reset/${generateAccessToken(email)}" 
-//         //                 method="POST">
-//         //             <input type="text" id="email" value="${email}" hidden>
-//         //             <input type="text" id="newPassword" value="${password}" hidden>
-//         //             <a href="#" onclick="document.getElementById('myform').submit(); return false;"> the link </a>
-//         //         </form>
-//         //         to comfirm your password in Usof. The link will be active for 2 hours`
-//         // html: `Hi ${login}!<br>Click 
-//         //             <a href="/kjli" onclick="console.log('here'); fetch('http://localhost:3000/api/auth/password-reset/${generateAccessToken(email)}'); return false;"> the link </a>
-//         //         to comfirm your password in Usof. The link will be active for 2 hours`
-//     },
-//     err => {
-//         if (err) {
-//             console.log(err);
-//         }
-//     });    
-// }
-
 function sendEmail(email, subject, text, html) {
     transporter.sendMail({
         from: '"Usof" <ucodeskhomenko@gmail.com>',

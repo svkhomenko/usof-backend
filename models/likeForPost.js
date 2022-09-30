@@ -24,10 +24,6 @@ module.exports = function initLikeForPost(sequelize) {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
             allowNull: false
-
-            // type: 'TIMESTAMP',
-            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-            // allowNull: false
         },
         type: {
             type: DataTypes.ENUM('like', 'dislike'),

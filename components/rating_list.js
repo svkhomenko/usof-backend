@@ -8,13 +8,10 @@ const Rating = (props) => {
             fetch(`http://localhost:3000/api/users/${props.record.params.id}/rating`)
                 .then(res => res.json())
                 .then((result) => {
-                    console.log('id', props.record.params);
-                    console.log('result', result);
                     setRating(result.rating);
                 },
                 (error) => {
-                    console.log('id', props.record.params);
-                    console.log('error', error);
+                    console.error(error);
                 });
         }
     });

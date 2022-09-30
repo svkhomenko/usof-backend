@@ -35,7 +35,8 @@ async function confirmEmail(req, res) {
 
         await destroyJWTToken(confirmToken);
         
-        res.status(201).send();
+        res.setHeader("Location", `/api/users/${user.id}`)
+            .status(201).send();
     } catch (err) {
         res.status(401).send("Invalid token");
     }

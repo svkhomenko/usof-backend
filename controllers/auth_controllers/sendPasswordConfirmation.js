@@ -38,13 +38,6 @@ async function sendPasswordConfirmation(req, res) {
         sendEmail(data.email, subject, text, html);
     
         res.status(200).send();
-        
-        // const subject = 'Confirm your password reset in Usof';
-        // const text = `Hi ${user.login}! Click the link to comfirm your password reset in Usof. The link will be active for 2 hours`;
-        // const html = `Hi ${user.login}!<br>Click <a href="${data.link}">the link</a> to comfirm your password reset in Usof. The link will be active for 2 hours`;
-        // sendEmail(data.email, subject, text, html);
-    
-        // res.status(200).json({ confirmTokenForPasswordReset: await generateToken({ email: data.email, password: "password" }, "secret_password") });
     }
     catch(err) {
         if (err instanceof ValidationError) {

@@ -18,11 +18,11 @@ function destroyTokens() {
                 [Op.lt]: threshold,
             },
         }})
-    .catch(console.log);
+    .catch();
 }
 
 module.exports = function deleteTokens() {
-    destroyTokens();
+    // destroyTokens();
     setTimeout(destroyTokens, expire_sec * 1000);
 }
 

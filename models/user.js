@@ -55,7 +55,6 @@ module.exports = function initUser(sequelize) {
                         file = fs.readFileSync(filePath);
                     }
                     catch(error) {
-                        console.log('setter picturePath user', error);
                         return null;
                     }
 
@@ -106,17 +105,3 @@ module.exports = function initUser(sequelize) {
     });
 }
 
-// function validatePassword(password) {
-//     if (!/^[a-zA-Z0-9]+$/.test(password)) {
-//         throw new Error("Password must containt only a-z, A-Z, 0-9");
-//     }
-//     if (!/(?=.*\d)/.test(password)) {
-//         throw new Error("Password must containt at least one digit");
-//     }
-//     if (!/(?=.*[a-z])/.test(password)) {
-//         throw new Error("Password must containt at least one lowercase letter");
-//     }
-//     if (!/(?=.*[A-Z])/.test(password)) {
-//         throw new Error("Password must containt at least one uppercase letter");
-//     }
-// }

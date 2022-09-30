@@ -42,7 +42,8 @@ async function confirmPassword(req, res) {
 
         await destroyJWTToken(confirmToken);
         
-        res.status(201).send();
+        res.setHeader("Location", `/api/users/${user.id}`)
+            .status(201).send();
     } catch (err) {
         if (err instanceof ValidationError) {
             res.status(err.status)

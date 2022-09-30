@@ -15,10 +15,6 @@ module.exports = function initPost(sequelize) {
             type: DataTypes.DATE,
             defaultValue: Sequelize.NOW,
             allowNull: false
-
-            // type: 'TIMESTAMP',
-            // defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-            // allowNull: false
         },
         status: {
             type: DataTypes.ENUM('active', 'inactive'),

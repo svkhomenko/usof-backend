@@ -140,19 +140,6 @@ const CommentCommentSettings = {
 Comment.hasMany(Comment, { as: 'replies', ...CommentCommentSettings});
 Comment.belongsTo(Comment, {  as: 'repliedComment', ...CommentCommentSettings});
 
-// User.belongsToMany(Post, { 
-//     as: 'ownPostLikes',
-//     through: LikeForPost,
-//     foreignKey: "author",
-//     hooks: true
-// });
-// Post.belongsToMany(User, { 
-//     as: 'postLikeAuthor', 
-//     through: LikeForPost,
-//     hooks: true
-// });
-
-
 const UserLikeSettings = {
     foreignKey: {
         name: 'author',
@@ -177,18 +164,6 @@ User.hasMany(LikeForPost, UserLikeSettings);
 LikeForPost.belongsTo(User, UserLikeSettings);
 Post.hasMany(LikeForPost);
 LikeForPost.belongsTo(Post);
-
-// User.belongsToMany(Comment, { 
-//     as: 'ownCommentLikes',
-//     through: LikeForComment,
-//     foreignKey: "author",
-//     hooks: true
-// });
-// Comment.belongsToMany(User, { 
-//     as: 'commentLikeAuthor', 
-//     through: LikeForComment,
-//     hooks: true
-// });
 
 User.belongsToMany(Comment, { 
     as: 'ownCommentLikes',
@@ -270,73 +245,16 @@ User.prototype.getRating = async function() {
     return postLikes.count + commentLikes.count - postDislikes.count - commentDislikes.count;
 };
 
-// sequelize.sync({ force: true })
-// .then(() => {
-//     const bcrypt  = require("bcrypt");
-//     let salt = bcrypt.genSaltSync(10);
+// Recreating the database and filling it with test data
 
-//     User.create({
-//         login: 'aasa',
-//         encryptedPassword: bcrypt.hashSync('user1Q', salt),
-//         fullName: 'sfdsgtg',
-//         email: 'qqq@gmail.com',
-//         role: 'admin',
-//         status: 'active',
-//         // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
-//     });
-// });
-// sequelize.sync({ alter: true });
-sequelize.sync();
+sequelize.sync({ force: true })
+.then(() => {
+    require('./createTestData')(sequelize);
+});
 
 
-// (async () => {
-//         const user = await User.findOne({
-//             where: {
-//                 id: 1
-//             },
-//             // include: {
-//             //     model: Post,
-//             //     as: 'ownPosts'
-//             // }
-//         });
-//         console.log(await user.getRating());
-//         // console.log(user);
-// })();
-
-// User.create({
-//     login: 'notAdmin',
-//     encryptedPassword: bcrypt.hashSync('usxcvvcer1Q', salt),
-//     fullName: 'sfddfsgtg',
-//     email: 'qdsfqq@gmail.com',
-//     role: 'user'
-//     // profilePicture: fs.readFileSync(path.resolve("uploads", '1.png'))
-// });
-    
-// ImageFromPost.create({
-//     picturePath: '151663171830063-posts-logo.png',
-//     postId: 2
-// });
-
-
-
-// (async () => {
-//     const comment = await Comment.findAll({
-//         include: [
-//             {
-//                 model: Post
-//             },
-//             {
-//                 model: Comment,
-//                 as: 'replies'
-//             },
-//             {
-//                 model: Comment,
-//                 as: 'repliedComment'
-//             }
-//         ]
-//     });
-//     console.log(comment);
-// })();
+// Uncomment this and comment out the sync above if you don't want to recreate the database
+// sequelize.sync();
 
 const db = {
     sequelize: sequelize,
@@ -344,3 +262,4 @@ const db = {
 };
 
 module.exports = db;
+

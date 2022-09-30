@@ -69,7 +69,8 @@ async function createNewPost(req, res) {
             }));
         }
 
-        res.status(201).send();
+        res.setHeader("Location", `/api/posts/${post.id}`)
+            .status(201).send();
     }
     catch(err) {
         if (err instanceof ValidationError) {
