@@ -252,7 +252,6 @@ sequelize.sync({ force: true })
     require('./createTestData')(sequelize);
 });
 
-
 // Uncomment this and comment out the sync above if you don't want to recreate the database
 // sequelize.sync();
 
