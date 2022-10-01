@@ -5,8 +5,10 @@ const Token = db.sequelize.models.token;
 
 async function signJWTToken(...data) {
     const token = await jwt.sign(...data);
-    await Token.create({
-        token: token
+    await Token.findOrCreate({
+        where: {
+            token: token
+        }
     });
     return token;
 }

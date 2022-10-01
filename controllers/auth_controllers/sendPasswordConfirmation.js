@@ -29,7 +29,8 @@ async function sendPasswordConfirmation(req, res) {
         if (link[link.length - 1] !== '/') {
             link += '/';
         }
-        link += await generateToken({ email: data.email, password: "password" }, "secret_password");
+        // link += await generateToken({ email: data.email, password: "password" }, "secret_password");
+        link += (await generateToken({ email: data.email, password: "password" }, "secret_password")).replaceAll('.', 'dot');
 
         const subject = 'Confirm your password reset in Usof';
         const text = `Hi ${user.login}! Click the link to comfirm your password reset in Usof. The link will be active for 2 hours`;

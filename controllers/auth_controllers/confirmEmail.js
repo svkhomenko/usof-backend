@@ -13,6 +13,8 @@ const tokenOptions = JSON.parse(tokenOptFile);
 async function confirmEmail(req, res) {
     const confirmToken = req.params.confirm_token;
 
+    console.log("confirmToken", confirmToken);
+
     try {
         const decoded = await verifyJWTToken(confirmToken, tokenOptions.secret_email);
         if (!decoded.email) {
@@ -38,7 +40,7 @@ async function confirmEmail(req, res) {
         res.setHeader("Location", `/api/users/${user.id}`)
             .status(201).send();
     } catch (err) {
-        res.status(401).send("Invalid token");
+        res.status(401).json({ message: "Invalid token" });
     }
 }
 

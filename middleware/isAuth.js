@@ -14,7 +14,7 @@ async function isAuth(req, res, next) {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
         next();
     } catch (err) {
-        res.status(401).send("Invalid token");
+        res.status(401).json({ message: "Invalid token" });
     }
 }
 

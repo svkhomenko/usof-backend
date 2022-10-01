@@ -2,6 +2,11 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const app = express();
 
+const cors = require('cors');
+app.use(cors({
+    origin: '*'
+}));
+
 app.use(express.static('uploads'));
 app.use('/uploads', express.static('uploads'));
 

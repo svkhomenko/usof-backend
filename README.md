@@ -41,6 +41,7 @@ Usof backend uses a number of open source projects to work properly:
 - [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) - implementation of JSON Web Tokens
 - [bcrypt](https://www.npmjs.com/package/bcrypt) - library to help you hash passwords
 - [Multer](https://www.npmjs.com/package/multer) - node.js middleware for handling multipart/form-data, which is primarily used for uploading files
+- [cors](https://www.npmjs.com/package/cors) - node.js package for providing a Connect/Express middleware that can be used to enable CORS with various options
 
 ## Admin panel
 
@@ -51,11 +52,11 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 **Authorization**
 | Method | Endpoint | Description | Parameters |
 | :- | :- | :- | :- |
-| **POST** | `/api/auth/register` | Registration of a new user | login, password, passwordConfirmation, email, fullName, link (for client confirmation page) |
+| **POST** | `/api/auth/register` | Registration of a new user | login, password, passwordConfirmation, email, fullName, link (for client confirmation page, replace 'dot' with '.') |
 | **POST** | `/api/auth/email-confirmation/:confirm_token` | Confirmation of your email with a token from email |
-| **POST** | `/api/auth/login` | Log in user. Only users with a confirmed email can sign in | login, password, link (for new email confirmation) |
+| **POST** | `/api/auth/login` | Log in user. Only users with a confirmed email can sign in | login, password, link (for new email confirmation, replace 'dot' with '.') |
 | **POST** | `/api/auth/logout` | Log out authorized user |
-| **POST** | `/api/auth/password-reset` | Send a reset link to user email | email, link (for client confirmation page) |
+| **POST** | `/api/auth/password-reset` | Send a reset link to user email | email, link (for client confirmation page, replace 'dot' with '.') |
 | **POST** | `/api/auth/password-reset/:confirm_token` | Confirmation of new password with a token from email | newPassword |
 
 **User**
@@ -63,9 +64,9 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 | :- | :- | :- | :- |
 | **GET** | `/api/users` | Get all users | |
 | **GET** | `/api/users/:user_id` | Get specified user data | |
-| **POST** | `/api/users` | Create a new user. Only for admins | login, password, passwordConfirmation, email, fullName, role, link (for client confirmation page) |
+| **POST** | `/api/users` | Create a new user. Only for admins | login, password, passwordConfirmation, email, fullName, role, link (for client confirmation page, replace 'dot' with '.') |
 | **PATCH** | `/api/users/avatar` | Upload user avatar | avatar |
-| **PATCH** | `/api/users/:user_id` | Update user data | email, login, fullName, role, avatar, deleteAvatar (boolean), link (for client confirmation page) |
+| **PATCH** | `/api/users/:user_id` | Update user data | email, login, fullName, role, avatar, deleteAvatar (boolean), link (for client confirmation page, replace 'dot' with '.') |
 | **DELETE** | `/api/users/:user_id` | Delete user | |
 
 **Posts**

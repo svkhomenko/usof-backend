@@ -11,6 +11,7 @@ const tokenOptions = JSON.parse(tokenOptFile);
 
 async function getAllUsers(req, res) {
     const token = req.headers.authorization;
+
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
 
