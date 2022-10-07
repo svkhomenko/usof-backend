@@ -21,9 +21,10 @@ An API for a future question and answer service for professional and enthusiast 
     ```sh
     source <path_for_root_of_project>\db_init.sql
     ```
-4. Run the server
+4. Update file configs/db-config.json with your data
+5. Run the server
     ```sh
-    node index.js
+    node server.js
     ```
 
 *The app has been tested on Windows. Linux may require additional settings*
