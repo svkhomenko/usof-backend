@@ -4,7 +4,6 @@ const isAuth = require("../middleware/isAuth");
 const authRouter = express.Router();
 
 authRouter.post("/register", authController.register);
-// authRouter.post("/email-confirmation", authController.sendEmailConfirmation);
 authRouter.post("/email-confirmation/:confirm_token", authController.confirmEmail);
 authRouter.post("/login", authController.login);
 authRouter.post("/logout", isAuth, authController.logout);

@@ -9,7 +9,7 @@ async function updateCategoryData(req, res) {
     try {
         let curCategory = await Category.findByPk(categoryId);
         if (!curCategory) {
-            throw new ValidationError("No category with this id", 401);
+            throw new ValidationError("No category with this id", 400);
         }
 
         if (title) {

@@ -18,8 +18,8 @@ function commentImagesUpload(req, res, next) {
     });
 }
 
-commentsRouter.get("/:comment_id", isAuth, commentsController.getCommentById);
-commentsRouter.get("/:comment_id/like", isAuth, commentsController.getCommentLikeById);
+commentsRouter.get("/:comment_id", commentsController.getCommentById);
+commentsRouter.get("/:comment_id/like", commentsController.getCommentLikeById);
 commentsRouter.post("/:comment_id/like", isAuth, commentsController.createNewLikeUnderComment);
 commentsRouter.patch("/:comment_id", canUpdateCommentData, commentImagesUpload, commentsController.uploadCommentData);
 commentsRouter.delete("/:comment_id", canUpdateCommentData, commentsController.deleteComment);

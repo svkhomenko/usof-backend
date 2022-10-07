@@ -17,18 +17,9 @@ async function getAllCategories(req, res) {
         let where = {};
         if (req.query.search) {
             where = {
-                [Op.or]: [
-                    { 
-                        title: {
-                            [Op.substring]: req.query.search
-                        }
-                    },
-                    { 
-                        description: {
-                            [Op.substring]: req.query.search
-                        }
-                    }
-                ] 
+                title: {
+                    [Op.substring]: req.query.search
+                }
             };
         }
 

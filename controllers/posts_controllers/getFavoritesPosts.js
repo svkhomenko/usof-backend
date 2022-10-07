@@ -7,7 +7,6 @@ const { verifyJWTToken } = require('../../token/tokenTools');
 const sequelize = db.sequelize;
 const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
-const ImageFromPost = db.sequelize.models.imageFromPost;
 const LikeForPost = db.sequelize.models.likeForPost;
 const Category = db.sequelize.models.category;
 
@@ -137,9 +136,6 @@ async function getFavoritesPosts(req, res) {
                 ]
             },
             include: [
-                { 
-                    model: ImageFromPost
-                },
                 {
                     model: User,
                     as: 'postAuthor'
@@ -191,7 +187,7 @@ async function getFavoritesPosts(req, res) {
                     rating: await post.postAuthor.getRating(),
                     status: post.postAuthor.status
                 },
-                images: post.imageFromPosts.map(image => {
+                images: (await post.getImageFromPosts()).map(image => {
                     return ({
                         id: image.id,
                         image: image.image
@@ -199,7 +195,7 @@ async function getFavoritesPosts(req, res) {
                 }),
                 addToFavoritesUser: !!post.addToFavoritesUser.length,
                 isLiked: (ownlike ? { type: ownlike.type } : false),
-                categories: post.categories.map(category => {
+                categories: (await post.getCategories()).map(category => {
                     return ({
                         id: category.id,
                         title: category.title,

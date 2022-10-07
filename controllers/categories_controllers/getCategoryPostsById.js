@@ -7,7 +7,6 @@ const { verifyJWTToken } = require('../../token/tokenTools');
 const sequelize = db.sequelize;
 const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
-const ImageFromPost = db.sequelize.models.imageFromPost;
 const LikeForPost = db.sequelize.models.likeForPost;
 const Category = db.sequelize.models.category;
 
@@ -20,16 +19,21 @@ async function getCategoryPostsById(req, res) {
     const categoryId = req.params.category_id;
 
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
+        }
+        catch (err) {}
 
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
         }
 
         const curCategory = await Category.findByPk(categoryId);
         if (!curCategory) {
-            throw new ValidationError("No category with this id", 401);
+            throw new ValidationError("No category with this id", 400);
         }
 
         let limit = 10;
@@ -53,7 +57,7 @@ async function getCategoryPostsById(req, res) {
         }
         
         let where = {};
-        if (curUser.role === 'admin') {
+        if (curUser && curUser.role === 'admin') {
             if (req.query.filterStatus) {
                 let filterStatus = req.query.filterStatus.split(',');
                 where = {
@@ -131,9 +135,6 @@ async function getCategoryPostsById(req, res) {
                 ]
             },
             include: [
-                { 
-                    model: ImageFromPost
-                },
                 {
                     model: User,
                     as: 'postAuthor'
@@ -169,8 +170,8 @@ async function getCategoryPostsById(req, res) {
         });
 
         allPosts = await Promise.all(allPosts.map(async (post) => {
-            let [ownlike] = await post.getLikeForPosts({ where: { author: curUser.id } });
-            
+            let [ownlike] = await post.getLikeForPosts({ where: { author: (curUser ? curUser.id : 0) } });
+
             return ({
                 id: post.id,
                 title: post.title,
@@ -187,7 +188,7 @@ async function getCategoryPostsById(req, res) {
                     rating: await post.postAuthor.getRating(),
                     status: post.postAuthor.status
                 },
-                images: post.imageFromPosts.map(image => {
+                images: (await post.getImageFromPosts()).map(image => {
                     return ({
                         id: image.id,
                         image: image.image
@@ -195,7 +196,7 @@ async function getCategoryPostsById(req, res) {
                 }),
                 addToFavoritesUser: !!post.addToFavoritesUser.length,
                 isLiked: (ownlike ? { type: ownlike.type } : false),
-                categories: post.categories.map(category => {
+                categories: (await post.getCategories()).map(category => {
                     return ({
                         id: category.id,
                         title: category.title,

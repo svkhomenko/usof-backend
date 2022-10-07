@@ -17,11 +17,16 @@ async function getCommentById(req, res) {
     const commentId = req.params.comment_id;
     
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
+        }
+        catch (err) {}
 
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
         }
 
         const curComment = await Comment.findOne({
@@ -56,17 +61,17 @@ async function getCommentById(req, res) {
         if (!curPost) {
             throw new ValidationError("No post with this id", 404);
         }
-        if (curUser.role !== 'admin' && curComment.author != curUser.id
+        if ((!curUser || (curUser && curUser.role !== 'admin' && curComment.author != curUser.id))
             && (curPost.status === "inactive" || curComment.status === "inactive")) {
             throw new ValidationError("Forbidden data", 403); 
         }
 
-        let [ownlike] = await curComment.getLikeForComments({ where: { author: curUser.id } });
+        let [ownlike] = await curComment.getLikeForComments({ where: { author: (curUser ? curUser.id : 0) } });
 
         let repliedComment = null;
         if (curComment.repliedComment) {
             repliedComment = 'Comment is inactive'
-            if (curUser.role === 'admin' || curComment.repliedComment.author == curUser.id 
+            if ((curUser && (curUser.role === 'admin' || curComment.repliedComment.author == curUser.id ))
                 || curComment.repliedComment.status === 'active') {
 
                 repliedComment = {

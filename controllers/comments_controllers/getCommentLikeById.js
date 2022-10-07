@@ -17,13 +17,18 @@ async function getCommentLikeById(req, res) {
     const commentId = req.params.comment_id;
     
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
-
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
         }
+        catch (err) {}
 
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
+        }
+        
         const curComment = await Comment.findByPk(commentId);
         if (!curComment) {
             throw new ValidationError("No comment with this id", 404);
@@ -33,7 +38,7 @@ async function getCommentLikeById(req, res) {
         if (!curPost) {
             throw new ValidationError("No post with this id", 404);
         }
-        if (curUser.role !== 'admin' && curComment.author != curUser.id
+        if ((!curUser || (curUser && curUser.role !== 'admin' && curComment.author != curUser.id))
             && (curPost.status === "inactive" || curComment.status === "inactive")) {
             throw new ValidationError("Forbidden data", 403); 
         }

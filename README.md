@@ -64,6 +64,7 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 | :- | :- | :- | :- |
 | **GET** | `/api/users` | Get all users | |
 | **GET** | `/api/users/:user_id` | Get specified user data | |
+| **GET** | `/api/users/:user_id/rating` | Get specified user rating | |
 | **POST** | `/api/users` | Create a new user. Only for admins | login, password, passwordConfirmation, email, fullName, role, link (for client confirmation page, replace 'dot' with '.') |
 | **PATCH** | `/api/users/avatar` | Upload user avatar | avatar |
 | **PATCH** | `/api/users/:user_id` | Update user data | email, login, fullName, role, avatar, deleteAvatar (boolean), link (for client confirmation page, replace 'dot' with '.') |
@@ -80,7 +81,7 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 | **POST** | `/api/posts/:post_id/comments` | Create a new comment | content, repliedCommentId, commentImages |
 | **GET** | `/api/posts/:post_id/categories` | Get all categories associated with the specified post | |
 | **GET** | `/api/posts/:post_id/like` | Get all likes under the specified post. Pagination is implemented | page (starts with 1) |
-| **POST** | `/api/posts/` | Create a new post | title, content, categories (array), postImages |
+| **POST** | `/api/posts` | Create a new post | title, content, categories (array), postImages |
 | **POST** | `/api/posts/:post_id/like` | Create a new like/dislike under a post | type |
 | **POST** | `/api/posts/:post_id/favorites` | Update favorites for a post | |
 | **PATCH** | `/api/posts/:post_id` | Update the specified post | title, content, categories (array), status (active, inactive), deleteFiles (array of id), postImages |

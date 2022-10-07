@@ -16,11 +16,16 @@ async function getPostLikeById(req, res) {
     const postId = req.params.post_id;
     
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
+        }
+        catch (err) {}
 
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
         }
 
         const curPost = await Post.findByPk(postId);
@@ -28,7 +33,7 @@ async function getPostLikeById(req, res) {
             throw new ValidationError("No post with this id", 404);
         }
 
-        if (curUser.role !== 'admin' && curPost.status === "inactive") {
+        if ((!curUser || (curUser && curUser.role !== 'admin')) && curPost.status === "inactive") {
             throw new ValidationError("Forbidden data", 403); 
         }
 

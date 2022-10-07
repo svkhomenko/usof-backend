@@ -28,7 +28,6 @@ async function login(req, res) {
                 if (link[link.length - 1] !== '/') {
                     link += '/';
                 }
-                // link += await generateToken({ email: user.email }, "secret_email");
                 link += (await generateToken({ email: data.email }, "secret_email")).replaceAll('.', 'dot');
 
                 const subject = 'Confirm your email in Usof';

@@ -29,7 +29,6 @@ async function sendPasswordConfirmation(req, res) {
         if (link[link.length - 1] !== '/') {
             link += '/';
         }
-        // link += await generateToken({ email: data.email, password: "password" }, "secret_password");
         link += (await generateToken({ email: data.email, password: "password" }, "secret_password")).replaceAll('.', 'dot');
 
         const subject = 'Confirm your password reset in Usof';
@@ -51,7 +50,7 @@ async function sendPasswordConfirmation(req, res) {
         else {
             console.log('err', err, err.message);
 
-            res.status(400)
+            res.status(500)
                 .json({ message: err });
         } 
     }

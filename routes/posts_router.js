@@ -23,6 +23,7 @@ function postImagesUpload(req, res, next) {
 
     upload(req, res, function (err) {
         if (err) {
+            console.log('err', err);
             return res.status(400)
                 .json({ message: err });
         }
@@ -37,7 +38,7 @@ postsRouter.get("/:post_id", postsController.getPostById);
 postsRouter.get("/:post_id/comments", postsController.getPostCommentsById);
 postsRouter.post("/:post_id/comments", isAuth, commentImagesUpload, postsController.createNewComment);
 postsRouter.get("/:post_id/categories", postsController.getPostCategoriesById);
-postsRouter.get("/:post_id/like", isAuth, postsController.getPostLikeById);
+postsRouter.get("/:post_id/like", postsController.getPostLikeById);
 postsRouter.post("/", isAuth, postImagesUpload, postsController.createNewPost);
 postsRouter.post("/:post_id/like", isAuth, postsController.createNewLikeUnderPost);
 postsRouter.post("/:post_id/favorites", isAuth, postsController.updateFavoritesPosts);

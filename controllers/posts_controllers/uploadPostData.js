@@ -43,7 +43,7 @@ async function uploadPostData(req, res) {
             for (let i = 0; i < categories.length; i++) {
                 const category = await Category.findByPk(categories[i]);
                 if (!category) {
-                    throw new ValidationError("No category with this id", 401);
+                    throw new ValidationError("No category with this id", 400);
                 }
             }
         }

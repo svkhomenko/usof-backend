@@ -13,8 +13,6 @@ const tokenOptions = JSON.parse(tokenOptFile);
 async function confirmEmail(req, res) {
     const confirmToken = req.params.confirm_token;
 
-    console.log("confirmToken", confirmToken);
-
     try {
         const decoded = await verifyJWTToken(confirmToken, tokenOptions.secret_email);
         if (!decoded.email) {

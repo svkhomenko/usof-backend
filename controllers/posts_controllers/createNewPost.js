@@ -16,7 +16,7 @@ const tokenOptions = JSON.parse(tokenOptFile);
 async function createNewPost(req, res) {
     const token = req.headers.authorization;
     const { title, content, categories } = req.body;
-    
+
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
 
@@ -40,7 +40,7 @@ async function createNewPost(req, res) {
             for (let i = 0; i < categories.length; i++) {
                 const category = await Category.findByPk(categories[i]);
                 if (!category) {
-                    throw new ValidationError("No category with this id", 401);
+                    throw new ValidationError("No category with this id", 400);
                 }
             }
         }

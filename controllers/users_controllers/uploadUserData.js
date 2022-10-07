@@ -65,7 +65,7 @@ async function uploadUserData(req, res) {
 
         let curUser = await User.findByPk(id);
         if (!curUser) {
-            throw new ValidationError("No user with this id", 401);
+            throw new ValidationError("No user with this id", 400);
         }
 
         if (data.email) {
@@ -79,7 +79,6 @@ async function uploadUserData(req, res) {
             if (link[link.length - 1] !== '/') {
                 link += '/';
             }
-            // link += await generateToken({ email: data.email }, "secret_email");
             link += (await generateToken({ email: data.email }, "secret_email")).replaceAll('.', 'dot');
     
             const subject = 'Confirm your email in Usof';
