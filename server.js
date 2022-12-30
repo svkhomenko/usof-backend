@@ -4,7 +4,8 @@ const app = express();
 
 const cors = require('cors');
 app.use(cors({
-    origin: '*'
+    origin: '*',
+    exposedHeaders: "Location"
 }));
 
 app.use(express.static('uploads'));

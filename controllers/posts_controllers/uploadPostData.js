@@ -8,6 +8,7 @@ const Post = db.sequelize.models.post;
 const ImageFromPost = db.sequelize.models.imageFromPost;
 const Category = db.sequelize.models.category;
 const CategoryPost = db.sequelize.models.categoryPost;
+const { validateTitle, validateContent } = require('../tools/dataValidation');
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
@@ -16,7 +17,7 @@ const tokenOptions = JSON.parse(tokenOptFile);
 async function uploadPostData(req, res) {
     const token = req.headers.authorization;
     const postId = req.params.post_id;
-    const { title, content, categories, status, deleteFiles } = req.body;
+    let { title, content, categories, status, deleteFiles, deleteAllCategories } = req.body;
     
     try {
         const decoded = await verifyJWTToken(token, tokenOptions.secret);
@@ -59,19 +60,33 @@ async function uploadPostData(req, res) {
         }
 
         if (post.author == curUser.id) {
+            if (title) {
+                validateTitle(title);
+                post.set({
+                    title
+                });
+            }
+    
+            if (content) {
+                validateContent(content);
+                post.set({
+                    content
+                });
+            }
+
             if (deleteFiles) {
                 if (!Array.isArray(deleteFiles)) {
                     throw new ValidationError("deleteFiles must be array", 400);
                 }
 
-                deleteFiles.forEach(async (fileId) => {
+                await Promise.all(deleteFiles.map(async (fileId) => {
                     await ImageFromPost.destroy({
                         where: {
                             id: fileId,
                             postId: post.id
                         }
                     });
-                });
+                }));
             }
     
             let { count } = await ImageFromPost.findAndCountAll({
@@ -94,18 +109,6 @@ async function uploadPostData(req, res) {
                     }
                 }));
             }
-    
-            if (title) {
-                post.set({
-                    title
-                });
-            }
-    
-            if (content) {
-                post.set({
-                    content
-                });
-            }
         }
 
         post = await post.save();
@@ -123,6 +126,13 @@ async function uploadPostData(req, res) {
                     postId: post.id
                 });
             }));
+        }
+        else if (deleteAllCategories) {
+            await CategoryPost.destroy({
+                where: {
+                    postId: post.id
+                }
+            });
         }
         
         post = await Post.findOne({

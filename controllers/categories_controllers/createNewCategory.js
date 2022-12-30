@@ -1,17 +1,14 @@
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
 const Category = db.sequelize.models.category;
+const { validateTitle, validateDescription } = require('../tools/dataValidation');
 
 async function createNewCategory(req, res) {
     const { title, description } = req.body;
     
     try {
-        if (!title) {
-            throw new ValidationError("Title is required", 400);
-        }
-        if (!description) {
-            throw new ValidationError("Description is required", 400);
-        }
+        validateTitle(title);
+        validateDescription(description);
 
         const category = await Category.create({
             title,

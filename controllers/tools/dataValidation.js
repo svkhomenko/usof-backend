@@ -73,11 +73,41 @@ async function validateEmail(email) {
     if (user) {
         throw new ValidationError("The user with this email already exists", 400);
     }
+    if (email.length > 200) {
+        throw new ValidationError("Email length must be less than 200 characters", 400);
+    }
 }
 
 function validateRole(role) {
     if (role !== 'admin' && role !== 'user') {
         throw new ValidationError("Role must be 'admin' or 'user'", 400);
+    }
+}
+
+function validateTitle(title) {
+    if (!title) {
+        throw new ValidationError("Title is required", 400);
+    }
+    if (title.length > 200) {
+        throw new ValidationError("Title length must be less than 200 characters", 400);
+    }
+}
+
+function validateDescription(description) {
+    if (!description) {
+        throw new ValidationError("Description is required", 400);
+    }
+    if (description.length > 65000) {
+        throw new ValidationError("Description length must be less than 65000 characters", 400);
+    }
+}
+
+function validateContent(content) {
+    if (!content) {
+        throw new ValidationError("Content is required", 400);
+    }
+    if (content.length > 65000) {
+        throw new ValidationError("Content length must be less than 65000 characters", 400);
     }
 }
 
@@ -87,6 +117,9 @@ module.exports = {
     validateLogin,
     validateFullName,
     validateEmail,
-    validateRole
+    validateRole,
+    validateTitle,
+    validateDescription,
+    validateContent
 }
 

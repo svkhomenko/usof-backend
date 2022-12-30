@@ -140,7 +140,7 @@ async function createTestData(sequelize) {
     });
 
     const comment21 = await Comment.create({
-        content: `Documentation: <a href="https://nodejs.org/api/http.html#http_response_setheader_name_value">res.setHeader()</a>, <a href="http://expressjs.com/en/api.html#res.set">res.set()</a>`,
+        content: `Just read the documentation`,
         author: user2.id,
         postId: post2.id,
         status: 'active',

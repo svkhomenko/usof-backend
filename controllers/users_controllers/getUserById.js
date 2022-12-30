@@ -14,11 +14,16 @@ async function getUserById(req, res) {
     const id = req.params.user_id;
 
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
+        }
+        catch (err) {}
 
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
         }
 
         let user = await User.findByPk(id);
@@ -26,7 +31,8 @@ async function getUserById(req, res) {
             throw new ValidationError("No user with this id", 404);
         }
 
-        if (curUser.role !== 'admin' && user.status === "pending") {
+        if ((!curUser || (curUser && curUser.role !== 'admin')) 
+            && user.status === "pending") {
             throw new ValidationError("Forbidden data", 403); 
         }
         

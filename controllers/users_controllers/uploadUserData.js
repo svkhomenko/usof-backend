@@ -43,6 +43,9 @@ async function validateNewEmail(email, id) {
         if (user) {
             throw new ValidationError("The user with this email already exists", 400);
         }
+        if (email.length > 200) {
+            throw new ValidationError("Email length must be less than 200 characters", 400);
+        }
     }
 }
 
@@ -65,7 +68,7 @@ async function uploadUserData(req, res) {
 
         let curUser = await User.findByPk(id);
         if (!curUser) {
-            throw new ValidationError("No user with this id", 400);
+            throw new ValidationError("No user with this id", 404);
         }
 
         if (data.email) {
@@ -95,7 +98,7 @@ async function uploadUserData(req, res) {
 
         if (data.fullName) {
             curUser.set({
-                login: data.fullName
+                fullName: data.fullName
             });
         }
 
@@ -110,7 +113,7 @@ async function uploadUserData(req, res) {
             });
         }
 
-        if (data.role) {
+        if (data.role && curUser.role == 'admin') {
             curUser.set({
                 role: data.role
             });

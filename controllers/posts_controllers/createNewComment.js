@@ -7,6 +7,7 @@ const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
 const Comment = db.sequelize.models.comment;
 const ImageFromComment = db.sequelize.models.imageFromComment;
+const { validateContent } = require('../tools/dataValidation');
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
@@ -34,9 +35,7 @@ async function createNewComment(req, res) {
             throw new ValidationError("Forbidden data", 403); 
         }
 
-        if (!content) {
-            throw new ValidationError("Content is required", 400);
-        }
+        validateContent(content);
 
         if (repliedCommentId) {
             const repliedComment = await Comment.findByPk(repliedCommentId);

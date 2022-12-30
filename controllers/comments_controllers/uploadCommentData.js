@@ -7,6 +7,7 @@ const User = db.sequelize.models.user;
 const Post = db.sequelize.models.post;
 const Comment = db.sequelize.models.comment;
 const ImageFromComment = db.sequelize.models.imageFromComment;
+const { validateContent } = require('../tools/dataValidation');
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
@@ -50,19 +51,26 @@ async function uploadCommentData(req, res) {
         }
 
         if (curComment.author == curUser.id) {
+            if (content) {
+                validateContent(content);
+                curComment.set({
+                    content
+                });
+            }
+            
             if (deleteFiles) {
                 if (!Array.isArray(deleteFiles)) {
                     throw new ValidationError("deleteFiles must be array", 400);
                 }
 
-                deleteFiles.forEach(async (fileId) => {
+                await Promise.all(deleteFiles.map(async (fileId) => {
                     await ImageFromComment.destroy({
                         where: {
                             id: fileId,
                             commentId: curComment.id
                         }
                     });
-                });
+                }));
             }
     
             let { count } = await ImageFromComment.findAndCountAll({
@@ -84,12 +92,6 @@ async function uploadCommentData(req, res) {
                         });
                     }
                 }));
-            }
-    
-            if (content) {
-                curComment.set({
-                    content
-                });
             }
         }
 

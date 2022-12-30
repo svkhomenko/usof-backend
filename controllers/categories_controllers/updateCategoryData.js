@@ -1,6 +1,7 @@
 const db = require("../../models/init.js");
 const ValidationError = require('../../errors/ValidationError');
 const Category = db.sequelize.models.category;
+const { validateTitle, validateDescription } = require('../tools/dataValidation');
 
 async function updateCategoryData(req, res) {
     const categoryId = req.params.category_id;
@@ -13,16 +14,18 @@ async function updateCategoryData(req, res) {
         }
 
         if (title) {
+            validateTitle(title);
             curCategory.set({
                 title
             });
         }
         if (description) {
+            validateDescription(description);
             curCategory.set({
                 description
             });
         }
-
+        
         curCategory = await curCategory.save();
 
         res.status(200)

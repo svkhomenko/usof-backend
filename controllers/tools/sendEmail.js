@@ -15,6 +15,7 @@ const nodemailerOptFile = fs.readFileSync(nodemailerFilePath);
 const nodemailerOptions = JSON.parse(nodemailerOptFile);
 
 const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
     service: 'gmail',
     auth: {
         user: nodemailerOptions.user,

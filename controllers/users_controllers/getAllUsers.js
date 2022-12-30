@@ -1,6 +1,7 @@
 const path = require("path");
 const fs  = require("fs");
 const db = require("../../models/init.js");
+const { Op } = require("sequelize");
 const ValidationError = require('../../errors/ValidationError');
 const { verifyJWTToken } = require('../../token/tokenTools');
 const User = db.sequelize.models.user;
@@ -13,25 +14,63 @@ async function getAllUsers(req, res) {
     const token = req.headers.authorization;
 
     try {
-        const decoded = await verifyJWTToken(token, tokenOptions.secret);
+        let decoded;
+        let curUser;
+        
+        try {
+            decoded = await verifyJWTToken(token, tokenOptions.secret);
+        }
+        catch (err) {}
 
-        const curUser = await User.findByPk(decoded.id);
-        if (!curUser) {
-            throw new ValidationError("Invalid token", 401);
+        if (decoded && decoded.id) {
+            curUser = await User.findByPk(decoded.id);
         }
 
-        let allUsers;
-        if (curUser.role === 'admin') {
-            allUsers = await User.findAll();
+        let limit = 50;
+        let offset = 0;
+        if (req.query.page) {
+            if (req.query.page < 1) {
+                throw new ValidationError("No such page", 400);
+            }
+            offset = (req.query.page - 1) * limit;
         }
-        else {
-            allUsers = await User.findAll({
-                where: {
-                    status: 'active'
-                },
-            });
+
+        let where = {};
+        if (!(curUser && curUser.role === 'admin')) {
+            where = {
+                status: 'active'
+            };
         }
         
+        if (req.query.search) {
+            where = {
+                ...where,
+                [Op.or]: [
+                    { 
+                        login: {
+                            [Op.substring]: req.query.search
+                        }
+                    },
+                    { 
+                        fullName: {
+                            [Op.substring]: req.query.search
+                        }
+                    },
+                    { 
+                        email: {
+                            [Op.substring]: req.query.search
+                        }
+                    }
+                ] 
+            };
+        }
+
+        let {count: countUsers, rows: allUsers} = await User.findAndCountAll({
+            where: where,
+            offset: offset,
+            limit: limit
+        });
+
         allUsers = await Promise.all(allUsers.map(async (user) => {
             return ({
                 id: user.id,
@@ -46,7 +85,11 @@ async function getAllUsers(req, res) {
         }));
         
         res.status(200)
-            .json(allUsers);
+            .json({
+                limit,
+                countUsers,
+                allUsers
+            });
     }
     catch(err) {
         if (err instanceof ValidationError) {

@@ -22,7 +22,6 @@ function destroyTokens() {
 }
 
 module.exports = function deleteTokens() {
-    // destroyTokens();
     setTimeout(destroyTokens, expire_sec * 1000);
 }
 

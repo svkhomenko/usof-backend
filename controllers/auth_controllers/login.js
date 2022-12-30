@@ -28,7 +28,7 @@ async function login(req, res) {
                 if (link[link.length - 1] !== '/') {
                     link += '/';
                 }
-                link += (await generateToken({ email: data.email }, "secret_email")).replaceAll('.', 'dot');
+                link += (await generateToken({ email: user.email }, "secret_email")).replaceAll('.', 'dot');
 
                 const subject = 'Confirm your email in Usof';
                 const text = `Hi ${user.login}! Click the link to comfirm your email in Usof. The link will be active for 2 hours`;

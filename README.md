@@ -6,7 +6,7 @@ An API for a future question and answer service for professional and enthusiast 
 
 1. Clone project 
     ```sh
-    git clone git@gitlab.ucode.world:connect-khpi/connect-fullstack-usof-backend/skhomenko.git
+    git clone https://github.com/svkhomenko/usof-backend.git
     ```
 2. In the root of project run
     ```sh
@@ -63,7 +63,7 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 **User**
 | Method | Endpoint | Description | Parameters |
 | :- | :- | :- | :- |
-| **GET** | `/api/users` | Get all users | |
+| **GET** | `/api/users` | Get all users | Pagination is implemented | page (starts with 1), search |
 | **GET** | `/api/users/:user_id` | Get specified user data | |
 | **GET** | `/api/users/:user_id/rating` | Get specified user rating | |
 | **POST** | `/api/users` | Create a new user. Only for admins | login, password, passwordConfirmation, email, fullName, role, link (for client confirmation page, replace 'dot' with '.') |
@@ -78,14 +78,14 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 | **GET** | `/api/posts/own-posts` | Get own posts. Pagination is implemented | page (starts with 1), orderBy (date), filterStatus (active, inactive) (separated by commas), search, filterCategory (separated by commas), filterDate (from...to) |
 | **GET** | `/api/posts/favorites` | Get favorites posts. Pagination is implemented | page (starts with 1), orderBy (date), filterStatus (active, inactive) (separated by commas), search, filterCategory (separated by commas), filterDate (from...to) |
 | **GET** | `/api/posts/:post_id` | Get specified post data | |
-| **GET** | `/api/posts/:post_id/comments` | Get all comments for the specified post | |
+| **GET** | `/api/posts/:post_id/comments` | Get all comments for the specified post. Pagination is implemented | lastDate, numberOfPosts |
 | **POST** | `/api/posts/:post_id/comments` | Create a new comment | content, repliedCommentId, commentImages |
 | **GET** | `/api/posts/:post_id/categories` | Get all categories associated with the specified post | |
 | **GET** | `/api/posts/:post_id/like` | Get all likes under the specified post. Pagination is implemented | page (starts with 1) |
 | **POST** | `/api/posts` | Create a new post | title, content, categories (array), postImages |
 | **POST** | `/api/posts/:post_id/like` | Create a new like/dislike under a post | type |
 | **POST** | `/api/posts/:post_id/favorites` | Update favorites for a post | |
-| **PATCH** | `/api/posts/:post_id` | Update the specified post | title, content, categories (array), status (active, inactive), deleteFiles (array of id), postImages |
+| **PATCH** | `/api/posts/:post_id` | Update the specified post | title, content, categories (array), status (active, inactive), deleteFiles (array of id), postImages, deleteAllCategories (boolean) |
 | **DELETE** | `/api/posts/:post_id` | Delete a post | |
 | **DELETE** | `/api/posts/:post_id/like` | Delete like/dislike under a post | |
 
@@ -103,7 +103,7 @@ Admin panel is available at http://localhost:3000/admin/login. For admins only
 | Method | Endpoint | Description | Parameters |
 | :- | :- | :- | :- |
 | **GET** | `/api/comments/:comment_id` | Get specified comment data | |
-| **GET** | `/api/comments/:comment_id/like` | Get all likes under the specified comment. Pagination is implemented | page (starts with 1)
+| **GET** | `/api/comments/:comment_id/like` | Get all likes under the specified comment. Pagination is implemented | page (starts with 1) |
 | **POST** | `/api/comments/:comment_id/like` | Create a new like/dislike under a comment | type |
 | **PATCH** | `/api/comments/:comment_id` | Update specified comment data | content, status, deleteFiles (array), commentImages |
 | **DELETE** | `/api/comments/:comment_id` | Delete a comment |

@@ -8,6 +8,7 @@ const Post = db.sequelize.models.post;
 const ImageFromPost = db.sequelize.models.imageFromPost;
 const Category = db.sequelize.models.category;
 const CategoryPost = db.sequelize.models.categoryPost;
+const { validateTitle, validateContent } = require('../tools/dataValidation');
 
 const tokenFilePath = path.resolve("configs", "token-config.json");
 const tokenOptFile = fs.readFileSync(tokenFilePath);
@@ -25,12 +26,8 @@ async function createNewPost(req, res) {
             throw new ValidationError("Invalid token", 401);
         }
 
-        if (!content) {
-            throw new ValidationError("Content is required", 400);
-        }
-        if (!title) {
-            throw new ValidationError("Title is required", 400);
-        }
+        validateTitle(title);
+        validateContent(content);
 
         if (categories) {
             if (!Array.isArray(categories)) {

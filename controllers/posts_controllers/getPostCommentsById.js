@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const path = require("path");
 const fs  = require("fs");
 const db = require("../../models/init.js");
@@ -39,19 +40,35 @@ async function getPostCommentsById(req, res) {
         }
 
         let limit = 10;
-        let offset = 0;
-        if (req.query.page) {
-            if (req.query.page < 1) {
-                throw new ValidationError("No such page", 400);
-            }
-            offset = (req.query.page - 1) * limit;
-        }
-
+        
         let where = {};
         if (!(curUser && curUser.role === 'admin')) {
             where = {
                 status: 'active'
             }
+        }
+
+        if (req.query.lastDate) {
+            let valid = (new Date(req.query.lastDate)).getTime() > 0;
+            if (!valid) {
+                throw new ValidationError("lastDate is invalid", 400);
+            }
+            
+            where = {
+                ...where,
+                publishDate: {
+                    [Op.gt]: req.query.lastDate
+                }
+            };
+        }
+        else if (req.query.numberOfPosts) {
+            let numberOfPosts = +req.query.numberOfPosts;
+            if (isNaN(numberOfPosts)) {
+                throw new ValidationError("numberOfPosts is invalid", 400);
+            }
+            if (numberOfPosts > limit) {
+                limit = numberOfPosts;
+            } 
         }
         
         let {count: countComments, rows: allComments} = await Comment.findAndCountAll({
@@ -78,8 +95,7 @@ async function getPostCommentsById(req, res) {
                     ]
                 }
             ],
-            order: [['publishDate', 'DESC']],
-            offset: offset,
+            order: [['publishDate', 'ASC']],
             limit: limit
         });
 
